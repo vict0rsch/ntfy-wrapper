@@ -1,3 +1,6 @@
+"""
+A module containing utility functions for ntfy-wrapper.
+"""
 from pathlib import Path
 from typing import Optional, Union, List, Dict
 import configparser
@@ -91,7 +94,7 @@ def load_conf(conf_path: Optional[Union[str, Path]] = None) -> dict:
     return {
         "title": "Message from ntfy-wrapper",
         "tags": "fire",
-        "icon": "https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/logo.png",
+        "icon": "https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/logo.png",  # noqa E501
     }
 
 

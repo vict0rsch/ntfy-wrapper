@@ -1,3 +1,6 @@
+"""
+Main class for ntfy-wrapper.
+"""
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 from uuid import uuid4
@@ -8,6 +11,11 @@ from ntfy_wrapper.utils import get_conf_path, load_conf, write_conf
 
 
 class Notifier:
+    """
+    The main class in ntfy-wrapper.
+    A Notifier(...) will handle both the configuration file and the notifications.
+    """
+
     def __init__(
         self,
         topics: Optional[Union[str, List[str]]] = None,
@@ -18,25 +26,79 @@ class Notifier:
         warnings: Optional[bool] = True,
         verbose: Optional[bool] = True,
     ):
+        """
+        Constructor for the Notifier class.
+
+        Its spirit is to reduce redundancy as much as possible.
+        This is why its configuration is saved in a file by default.
+
+        It comes with sane defaults so ``ntfy = Notifier()`` is enough to get started!
+
+        .. warning::
+            Remember that a topic is much like a password:
+            anyone with that string can subscribe to your notifications so
+            it's probably best you do not track any piece of code containing
+            your topics. That includes the configuration file this class creates
+            automatically (except if ``write`` is False).
+
+        Args:
+            topics (Optional[Union[str, List[str]]], optional): String, or list of
+                strings describing the default target topics to publish to using
+                https://ntfy.sh. Remember that a topic is much like a password:
+                anyone with that string can subscribe to your notifications so
+                it's probably best you do not track any piece of code containing
+                your topics. That includes the configuration file this class creates
+                automatically (except if ``write`` is False).
+                Defaults to None, meaning a random (uuid) topic will be generated
+                for you, and re-used next time, provided you have enabled ``write``.
+            emails (Optional[Union[str, List[str]]], optional): String, or list of
+                strings describing the emails to send notifications to by default.
+                Be aware of the rate limits: https://ntfy.sh/docs/publish/#limitations
+                Defaults to None.
+            defaults (Optional[Dict], optional): Dict whose keys and values will be
+                default keyword arguments for the ``Notifier.notify()`` method so that
+                you don't have to write the same stuff again and again throughout
+                your code. Defaults to {}.
+            conf_path (Optional[Union[str, Path]], optional): String or pathlib.Path
+                pointing to where the Notifier should get or create its INI
+                configuration file. Defaults to None, meaning ``$CWD/.ntfy.conf``.
+            write (Optional[bool], optional): Whether to write the Notifier's state
+                to the configuration file after initialization. Defaults to True.
+            warnings (Optional[bool], optional): Whether or not to print warnings,
+                in particular the version control warning if ``write`` is True (by
+                default). Defaults to True.
+            verbose (Optional[bool], optional): Whether to describe the Notifier after
+                its initialization from your args and the (potentially non-existing)
+                conf. Defaults to True.
+        """
         if isinstance(topics, str):
             topics = [topics]
 
         self.topics = topics
         self.emails = emails
+        # cwd/.ntfy.conf if conf_path is None
         self.conf_path = get_conf_path(conf_path)
         self.warnings = warnings
-
+        # read ini config if it exists
+        # otherwise, gets initialized with default values
+        # that can be overwritten by the user in the conf or the init args
         conf = load_conf(self.conf_path)
         conf.update(defaults)
 
         if self.topics is None:
-            self.topics = conf.pop("topics", [str(uuid4())])
+            if self.emails is None:
+                self._warn(
+                    "No topic set, and no email set."
+                    + " Creating a random topic for you."
+                )
+                self.topics = conf.pop("topics", [str(uuid4())])
         if self.emails is None:
             self.emails = conf.pop("emails", [])
 
         self.defaults = conf
 
         if write:
+            # save the config file
             self.write_to_conf()
 
         assert (
@@ -72,8 +134,9 @@ class Notifier:
         write: Optional[bool] = True,
     ):
         """
-        Remove topics from the configuration file.
-        If the topic is not in the configuration file, it is ignored.
+        Remove topics from the Notifier's targets.
+        If ``write`` is True, the configuration file is updated.
+        If a topic does not exist, it is ignored.
 
         Args:
             topics (List[str]): The topics to remove.
@@ -94,8 +157,9 @@ class Notifier:
         write: Optional[bool] = True,
     ):
         """
-        Remove emails from the configuration file.
-        If the topic is not in the configuration file, it is ignored.
+        Remove emails from the Notifier's targets.
+        If ``write`` is True, the configuration file is updated.
+        If an email does not exist, it is ignored.
 
         Args:
             emails (List[str]): The emails to remove.
@@ -112,13 +176,27 @@ class Notifier:
 
     def remove_all_topics(self, write: Optional[bool] = True):
         """
-        Remove all topics from the configuration file.
+        Remove all emails from the Notifier's targets.
+        If ``write`` is True, the configuration file is updated.
 
         Args:
             write (Optional[bool], optional): Whether to update the config file or not.
                 Defaults to True.
         """
         self.topics = []
+        if write:
+            self.write_to_conf()
+
+    def remove_all_emails(self, write: Optional[bool] = True):
+        """
+        Remove all emails from the Notifier's targets.
+        If ``write`` is True, the configuration file is updated.
+
+        Args:
+            write (Optional[bool], optional): Whether to update the config file or not.
+                Defaults to True.
+        """
+        self.emails = []
         if write:
             self.write_to_conf()
 
@@ -151,17 +229,23 @@ class Notifier:
         icon: Optional[str] = None,
     ):
         """
-        Send a notification to the given topics.
+        Send a notification to the given topics and emails.
+
         Refer to the documentation of the specific notifier for more details.
         https://ntfy.sh/docs/publish/
 
-        If topics is None, the topics are taken from the configuration file.
-        If emails is not None, the notification is sent by email to the given addresses.
-        If emails have been specified in the configuration file, they are used by
+        The ``defaults`` you may have used in the ``init()`` method are used here.
+        You can override them by passing the corresponding arguments.
+
+        If ``topics`` is None, the topics are taken from the configuration file.
+        If ``emails`` is not None, the notification is sent by email to the given
+        addresses.
+        If ``emails`` have been specified in the configuration file, they are used by
         default.
         Set emails="" to disable emails even if there are some in the configuration.
 
-        NB: you cannot send both a string message and a file attachment.
+        .. note::
+            You cannot send both a string message and a file attachment.
 
         Args:
             message (str): The message to send.
