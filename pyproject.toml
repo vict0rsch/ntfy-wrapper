@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "ntfy-wrapper"
+version = "0.1.0"
+description = "Fast & Free notifications for your code: Python wrapper around the ntfy.sh notifications service."
+authors = ["vict0rsch <vsch@pm.me>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "ntfy_wrapper"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.28.1"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^5.0.4"
+black = "^22.10.0"
+ipython = "^8.6.0"
+ipdb = "^0.13.9"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
