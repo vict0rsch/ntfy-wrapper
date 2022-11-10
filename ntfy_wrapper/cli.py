@@ -244,7 +244,7 @@ def send(
     Sends a notification to the given emails and topics. Optional command-line arguments
     can be passed to override the defaults in the config file and customize
     the message options. Refer to https://ntfy.sh/docs/publish to understand the
-    options.
+    options. Run `py-ntfy send --help` to see the available options.
 
 
     Args:
