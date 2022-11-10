@@ -84,6 +84,8 @@ class Notifier:
         # that can be overwritten by the user in the conf or the init args
         conf = load_conf(self.conf_path)
         conf.update(defaults)
+        conf_topics = conf.pop("topics", [str(uuid4())])
+        conf_emails = conf.pop("emails", [])
 
         if self.topics is None:
             if self.emails is None:
@@ -91,9 +93,9 @@ class Notifier:
                     "No topic set, and no email set."
                     + " Creating a random topic for you."
                 )
-                self.topics = conf.pop("topics", [str(uuid4())])
+                self.topics = conf_topics
         if self.emails is None:
-            self.emails = conf.pop("emails", [])
+            self.emails = conf_emails
 
         self.defaults = conf
 
