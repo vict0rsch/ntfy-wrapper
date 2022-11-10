@@ -75,7 +75,7 @@ def init(conf_path: Optional[str] = None, force: bool = False):
         + "\n   Use it to subscribe to notifications!",
         style="yellow",
     )
-    print(f"🎊 Config file created at {code(conf_path)}", style="green")
+    print(f"🎉 Config file created at {code(conf_path)}", style="green")
 
 
 @app.command()
@@ -97,7 +97,7 @@ def clean(conf_path: Optional[str] = None, force: bool = False):
     else:
         print(f"Config file does not exist at {code(conf_path)}")
         raise typer.Abort()
-    print(f"🎊 Config file removed from \n {code(conf_path)}", style="green")
+    print(f"🎉 Config file removed from \n {code(conf_path)}", style="green")
 
 
 @add_app.command("topic")
@@ -117,7 +117,7 @@ def add_topic(topic: str, conf_path: Optional[str] = None):
         print(f"Topic {topic} already exists.")
         raise typer.Abort()
     utils.write_conf(conf_path, topics, conf.pop("emails", None), conf)
-    print(f"🎊 Topic {code(topic)} added to {code(conf_path)}", style="green")
+    print(f"🎉 Topic {code(topic)} added to {code(conf_path)}", style="green")
 
 
 @add_app.command("email")
@@ -137,7 +137,7 @@ def add_email(email: str, conf_path: Optional[str] = None):
         print(f"email {email} already exists.")
         raise typer.Abort()
     utils.write_conf(conf_path, conf.pop("topics", None), emails, conf)
-    print(f"🎊 Email {code(email)} added to {code(conf_path)}", style="green")
+    print(f"🎉 Email {code(email)} added to {code(conf_path)}", style="green")
 
 
 @add_app.command("default")
@@ -160,7 +160,7 @@ def add_default(key: str, value: str, conf_path: Optional[str] = None):
         conf_path, conf.pop("topics", None), conf.pop("emails", None), conf
     )
     print(
-        f"🎊 Default {code(str(key)+'='+str(value))} added to {code(conf_path)}",
+        f"🎉 Default {code(str(key)+'='+str(value))} added to {code(conf_path)}",
         style="green",
     )
 
@@ -179,7 +179,7 @@ def remove_topic(topic: str, conf_path: Optional[str] = None):
     if topic in topics:
         topics.remove(topic)
         utils.write_conf(conf_path, topics, conf.pop("emails", None), conf)
-        print(f"🎊 Topic {code(topic)} removed from {code(conf_path)}", style="green")
+        print(f"🎉 Topic {code(topic)} removed from {code(conf_path)}", style="green")
     else:
         print(f"Topic {code(topic)} does not exist. Ignoring.")
 
@@ -198,7 +198,7 @@ def remove_email(email: str, conf_path: Optional[str] = None):
     if email in emails:
         emails.remove(email)
         utils.write_conf(conf_path, conf.pop("topics", None), emails, conf)
-        print(f"🎊 Email {code(email)} removed from {code(conf_path)}", style="green")
+        print(f"🎉 Email {code(email)} removed from {code(conf_path)}", style="green")
     else:
         print(f"Email {code(email)} does not exist. Ignoring.", style="yellow")
 
@@ -219,7 +219,7 @@ def remove_default(key: str, conf_path: Optional[str] = None):
             conf_path, conf.pop("topics", None), conf.pop("emails", None), conf
         )
         print(
-            f"🎊 Default {code(str(key)+'='+str(value))} removed from {code(conf_path)}",
+            f"🎉 Default {code(str(key)+'='+str(value))} removed from {code(conf_path)}",
             style="green",
         )
     else:
