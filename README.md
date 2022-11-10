@@ -40,9 +40,90 @@ if __name__ == "__main__":
         ntfy.notify(f"Error! -> {str(e)}", priority=4, emails="you@foo.bar")
 ```
 
+### Command-line
+
+`ntfy_wrapper` comes with a command-line interface called `py-ntfy`.
+
+* Get help
+
+    ```bash
+    $ py-ntfy --help
+
+    Usage: py-ntfy [OPTIONS] COMMAND [ARGS]...
+
+    ╭─ Options ────────────────────────────────────────────────────────────────╮
+    │ --install-completion          Install completion for the current shell.  │
+    │ --show-completion             Show completion for the current shell, to  │
+    │                               copy it or customize the installation.     │
+    │ --help                        Show this message and exit.                │
+    ╰──────────────────────────────────────────────────────────────────────────╯
+    ╭─ Commands ───────────────────────────────────────────────────────────────╮
+    │ add     [command sub-group] Add a new notification target or a default   │
+    │         notification value. Run `$ py-ntfy add --help` for more info.    │
+    │ clean   Removes the configuration file. Use --conf-path to specify a     │
+    │         path to the configuration file. Use --force to skip the          │
+    │         confirmation prompt.                                             │
+    │ init    Initializes the configuration file. It should NOT be tracked by  │
+    │         version control in order to protect the topic ID. Use            │
+    │         --conf-path to specify a path to the configuration file. Use     │
+    │         --force to overwrite an existing configuration file.             │
+    │ remove  [command sub-group] Remove a notification target or a default    │
+    │         notification value. Run `$ py-ntfy remove --help` for more info. │
+    ╰──────────────────────────────────────────────────────────────────────────╯
+
+    $ py-ntfy add --help
+    (similar output)
+
+    $ py-ntfy add default --help
+    (similar output)
+
+    $ py-ntfy remove --help
+    (similar output)
+    ```
+
+* Initialize the configuration file
+
+    ```bash
+    $ py-ntfy init
+    🔑 Your first topic is `f8e34b7a-74a3-49e7-96fc-4d89eaf6ea6c`.
+    Use it to subscribe to notifications!
+    🎊 Config file created at /path/to/repo/.ntfy.conf
+    ```
+
+* Add a topic or an email
+
+    ```bash
+    $ py-ntfy add topic some-secret-string-for-your-topic
+    🎊 Topic `some-secret-string-for-your-topic` added to /path/to/repo/.ntfy.conf
+
+    $ py-ntfy add email you@foo.bar
+    🎊 Email you@foo.bar added to /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
+    ```
+
+* Add a default value for the `.notify(...)` calls
+
+    ```bash
+    $ py-ntfy add default key value
+    🎊 Default key=value added to /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
+    ```
+
+* Remove items by simply replacing `add` by `remove`
+
+    ```bash
+    $ py-ntfy remove default key
+    🎊 Default key=value removed from /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
+
+    $ py-ntfy remove email hello@you.com
+    Email hello@you.com does not exist. Ignoring.
+    ```
+
+* Change the default configuration path for any command with the option `--conf-path`
+  * Specify a directory  `--conf-path path/to/conf/directory` and `.ntfy.conf` will be created there
+  * Specify a file `--conf-path path/to/file.conf` and that will be used as a configuration file
+
 ## Todo
 
-* [ ] Better readme and doc
-* [ ] CLI
+* [x] Better readme and doc
+* [x] CLI
 * [ ] Screenshots
 * [ ] `requests` timeout or non-blocking

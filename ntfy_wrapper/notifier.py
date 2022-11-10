@@ -172,7 +172,7 @@ class Notifier:
             else:
                 self.emails.remove(e)
         if write:
-            self.write_emails(overwrite=True)
+            self.write_to_conf()
 
     def remove_all_topics(self, write: Optional[bool] = True):
         """
@@ -203,10 +203,6 @@ class Notifier:
     def write_to_conf(self):
         """
         Write the topics to the configuration file.
-
-        Args:
-            overwrite (Optional[bool], optional): Whether the potentially existing
-                topics should be extended or overwritten. Defaults to False.
         """
         self._warn(
             "⚠️ Warning: your configuration may contain sensitive data. "
