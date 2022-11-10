@@ -91,7 +91,7 @@ def load_conf(conf_path: Optional[Union[str, Path]] = None) -> dict:
     return {
         "title": "Message from ntfy-wrapper",
         "tags": "fire",
-        "icon": "https://images.emojiterra.com/google/noto-emoji/v2.034/128px/1f525.png",
+        "icon": "https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/logo.png",
     }
 
 

@@ -1,4 +1,7 @@
-# ntfy-wrapper
+
+<p align="center">
+    <img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/ntfy-wrapper.png" width="300px" height="300px">
+</p>
 
 `ntfy-wrapper` is a free and hassle-free customizable notifier for Python. No login, no API token, no fees, no bullshit.
 
