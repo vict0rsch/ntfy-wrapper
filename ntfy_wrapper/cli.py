@@ -6,20 +6,20 @@ import typer
 from rich.console import Console
 from rich.theme import Theme
 
-from ntfy_wrapper import utils
+from ntfy_wrapper import utils, Notifier
 
 custom_theme = Theme({"code": "grey70 bold italic"})
 print = Console(theme=custom_theme).print
 
 app = typer.Typer()
 add_app = typer.Typer()
+remove_app = typer.Typer()
 app.add_typer(
     add_app,
     name="add",
     help="[command sub-group] Add a new notification target or a default "
     + "notification value. Run `$ py-ntfy add --help` for more info.",
 )
-remove_app = typer.Typer()
 app.add_typer(
     remove_app,
     name="remove",
@@ -221,6 +221,69 @@ def remove_default(key: str, conf_path: Optional[str] = None):
         )
     else:
         print(f"Default {code(key)} does not exist. Ignoring.")
+
+
+@app.command()
+def send(
+    message: str,
+    conf_path: Optional[str] = None,
+    emails: Optional[str] = None,
+    topics: Optional[str] = None,
+    title: Optional[str] = None,
+    priority: Optional[int] = None,
+    tags: Optional[str] = None,
+    click: Optional[str] = None,
+    attach: Optional[str] = None,
+    actions: Optional[str] = None,
+    icon: Optional[str] = None,
+):
+    """
+    Sends a notification to the given emails and topics. Optional command-line arguments
+    can be passed to override the defaults in the config file and customize
+    the message options. Refer to https://ntfy.sh/docs/publish to understand the
+    options.
+
+
+    Args:
+        message (str): The message to send
+        conf_path (Optional[str], optional): Where to load the configuration from.
+            Defaults to ``None`` which means ``$CWD/.ntfy.conf``.
+        emails (Optional[str], optional): Single email or comma-separated list of
+            emails to dispatch the notification to. Defaults to ``None``.
+        topics (Optional[str], optional): Single topic or comma-separated list of
+            topics to dispatch the notification to. Defaults to ``None``.
+        title (Optional[str], optional): The notification's title. Defaults to ``None``.
+        priority (Optional[int], optional): The notification's priority. Defaults to
+            ``None``.
+        tags (Optional[str], optional): The notification's tags. Defaults to ``None``.
+        click (Optional[str], optional): The notification's click option
+            (url for instance). Defaults to ``None``.
+        attach (Optional[str], optional): The notification's attachment.
+            Defaults to ``None``.
+        actions (Optional[str], optional): The notification's actions as per
+            https://ntfy.sh/docs/publish/#using-a-header. Defaults to ``None``.
+        icon (Optional[str], optional): _description_. Defaults to ``None``.
+    """
+    ntfy = Notifier(
+        topics=topics,
+        emails=emails,
+        defaults={},
+        conf_path=conf_path,
+        write=False,
+        warnings=False,
+        verbose=False,
+    )
+
+    ntfy.notify(
+        message,
+        title=title,
+        priority=priority,
+        tags=tags,
+        click=click,
+        attach=attach,
+        actions=actions,
+        icon=icon,
+    )
 
 
 if __name__ == "__main__":
