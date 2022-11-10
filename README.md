@@ -27,15 +27,15 @@ if __name__ == "__main__":
     ntfy.notify("Job has been allocated, starting Model training")
 
     try:
-        success = do_some_stuff()
-        if success:
+        results = do_some_stuff()
+        if results["metric"] > threshold:
             ntfy.notify(
-                f"All good!",
+                f"Great model! Its metric is {results['metric']:.3f}",
                 tags="white_check_mark",  # this is the ✅ emoji
-                click=success["online_run_url"],
+                click=results["online_run_url"],
             )
         else:
-            ntfy.notify("Oh no, it's not working", tags="disappointed")
+            ntfy.notify(f"Done, but not great ({results['metric']:.3f})", tags="disappointed")
     except Exception as e:
         ntfy.notify(f"Error! -> {str(e)}", priority=4, emails="you@foo.bar")
 ```
