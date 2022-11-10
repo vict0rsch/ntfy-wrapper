@@ -12,7 +12,7 @@ Values in [targets] can be strings or lists of strings (comma separated).
 Values in [message_defaults] can be best understood from the ntfy documentation:
 https://ntfy.sh/docs/publish/
 ⚠️
-Nota Bene: the 'topic' is kind of a passwort: anyone with
+Nota Bene: the 'topic' is kind of a password: anyone with
 The topic ID can send messages to your device, so protect it and make
 sure to remove this config file from the version control system.
 ⇩
@@ -112,7 +112,8 @@ def write_conf(
         conf_path (Path): The path to the configuration file.
         topics (Optional[List], optional): Topics to record . Defaults to [].
         emails (Optional[List], optional): Emails to record. Defaults to [].
-        defaults (Optional[Dict], optional): Additional message defaults. Defaults to {}.
+        defaults (Optional[Dict], optional): Additional message defaults.
+            Defaults to {}.
     """
     config = configparser.ConfigParser(allow_no_value=True)
     config.add_section("about")

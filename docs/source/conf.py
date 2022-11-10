@@ -27,6 +27,7 @@ extensions = [
 autoapi_type = "python"
 autoapi_dirs = ["../../ntfy_wrapper"]
 autoapi_member_order = "alphabetical"
+autoapi_python_class_content = "both"
 
 autodoc_typehints = "description"
 

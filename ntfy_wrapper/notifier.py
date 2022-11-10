@@ -231,8 +231,9 @@ class Notifier:
         """
         Send a notification to the given topics and emails.
 
-        Refer to the documentation of the specific notifier for more details.
-        https://ntfy.sh/docs/publish/
+        .. note::
+            Refer to the ntfy documentation more details about all those options:
+            https://ntfy.sh/docs/publish/
 
         The ``defaults`` you may have used in the ``init()`` method are used here.
         You can override them by passing the corresponding arguments.
@@ -242,9 +243,9 @@ class Notifier:
         addresses.
         If ``emails`` have been specified in the configuration file, they are used by
         default.
-        Set emails="" to disable emails even if there are some in the configuration.
+        Set ``emails=""`` to disable emails even if there are some in the configuration.
 
-        .. note::
+        .. warning::
             You cannot send both a string message and a file attachment.
 
         Args:
@@ -260,10 +261,10 @@ class Notifier:
             click (Optional[str], optional):  URL to open when a notification is
                 clicked. Defaults to None.
             attach (Optional[str], optional): Attachment to send: either a local image
-                file or an URL. Defaults to None.
+                file or an URL pointing to one. Defaults to None.
             actions (Optional[Union[str, List[str]]], optional): A string or list of
                 strings describing actions as per:
-                    https://ntfy.sh/docs/publish/#using-a-header
+                https://ntfy.sh/docs/publish/#using-a-header
                 Defaults to None.
             emails (Optional[List[str]], optional): _description_. Defaults to None.
             icon (Optional[str], optional): The notifications' icon as a URL to a

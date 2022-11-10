@@ -1,5 +1,6 @@
 .DS_Store
 .ntfy.conf
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
