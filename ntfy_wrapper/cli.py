@@ -1,3 +1,6 @@
+"""
+``py-ntfy`` command-line interface.
+"""
 from pathlib import Path
 from typing import Any, Optional
 from uuid import uuid4
@@ -264,7 +267,7 @@ def send(
             https://ntfy.sh/docs/publish/#using-a-header. Defaults to ``None``.
         icon (Optional[str], optional): _description_. Defaults to ``None``.
     """
-    ntfy = Notifier(
+    Notifier(
         topics=topics,
         emails=emails,
         defaults={},
@@ -272,9 +275,7 @@ def send(
         write=False,
         warnings=False,
         verbose=False,
-    )
-
-    ntfy.notify(
+    ).notify(
         message,
         title=title,
         priority=priority,
