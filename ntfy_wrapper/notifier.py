@@ -225,7 +225,7 @@ class Notifier:
         attach: Optional[str] = None,
         actions: Optional[Union[str, List[str]]] = None,
         icon: Optional[str] = None,
-    ):
+    ) -> List[str]:
         """
         Send a notification to the given topics and emails.
 
@@ -267,6 +267,13 @@ class Notifier:
             emails (Optional[List[str]], optional): _description_. Defaults to None.
             icon (Optional[str], optional): The notifications' icon as a URL to a
                 remote file. Defaults to None.
+
+        Raises:
+            ValueError: The user cannot specify both ``attach`` and ``message``
+
+        Returns:
+            List[str]: A list of the urls the notifications have been dispatched to:
+                one for each topic and one for each email.
         """
         headers = {**self.defaults, "priority": priority}
 
@@ -317,6 +324,8 @@ class Notifier:
 
         assert isinstance(topics, list)
 
+        dispatchs = []
+
         for dtype, dest in [("topic", t) for t in topics] + [
             ("email", e) for e in emails
         ]:
@@ -327,6 +336,8 @@ class Notifier:
                 url = "https://ntfy.sh/alerts"
             else:
                 url = f"https://ntfy.sh/{dest}"
+
+            dispatchs.append(dest)
 
             if not use_PUT:
                 requests.post(
@@ -341,3 +352,4 @@ class Notifier:
                     data=open(attach, "rb"),
                     headers=h,
                 )
+        return dispatchs

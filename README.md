@@ -127,6 +127,13 @@ if __name__ == "__main__":
     Email hello@you.com does not exist. Ignoring.
     ```
 
+* Send a notification from the command-line with `send`
+
+    ```bash
+    $ py-ntfy send "hello" --topics 99e89137-c3a3-47fd-a616-01677b15c5b7 --title "This is Victor" --click "https://9gag.com"
+    🎉 Notification sent to 99e89137-c3a3-47fd-a616-01677b15c5b7, you@foo.bar
+    ```
+
 * Change the default configuration path for any command with the option `--conf-path`
   * Specify a directory  `--conf-path path/to/conf/directory` and `.ntfy.conf` will be created there
   * Specify a file `--conf-path path/to/file.conf` and that will be used as a configuration file

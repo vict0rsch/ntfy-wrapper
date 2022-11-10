@@ -267,7 +267,7 @@ def send(
             https://ntfy.sh/docs/publish/#using-a-header. Defaults to ``None``.
         icon (Optional[str], optional): _description_. Defaults to ``None``.
     """
-    Notifier(
+    dispatchs = Notifier(
         topics=topics,
         emails=emails,
         defaults={},
@@ -284,6 +284,10 @@ def send(
         attach=attach,
         actions=actions,
         icon=icon,
+    )
+    print(
+        "🎉 Notification sent to " + ", ".join([code(d) for d in dispatchs]),
+        style="green",
     )
 
 
