@@ -29,6 +29,17 @@ app.add_typer(
 
 
 def code(value: Any) -> str:
+    """
+    Turns an object into a string and wraps it in a ``rich`` ``code`` block.
+    A pathlib Path will be shortened to the 3 last parts of the path.
+
+    Args:
+        value (Any): Object to convert to string and wrap in
+            a ``rich`` ``code`` block.
+
+    Returns:
+        str: Code-wrapped value: ``[code]{str(value)}[/code]``
+    """
     if isinstance(value, Path):
         if len(value.parts) > 3:
             value = Path(*value.parts[:2], "...", *value.parts[-3:])
