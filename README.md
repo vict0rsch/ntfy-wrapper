@@ -11,6 +11,14 @@ You can now **send** notification from your Python code and **receive** them on 
 
 Again, all credit to [`ntfy`](https://ntfy.sh).
 
+## Install
+
+Install `ntfy-wrapper` (and its 2 dependencies: `requests` and `typer`) with `pip`:
+
+```bash
+pip install ntfy-wrapper
+```
+
 ## How to use
 
 ```python
@@ -42,7 +50,7 @@ if __name__ == "__main__":
 
 ### Command-line
 
-`ntfy_wrapper` comes with a command-line interface called `py-ntfy`.
+`ntfy_wrapper` comes with a command-line interface called `py-ntfy`. It uses the great Python CLI tool [`Typer`](https://typer.tiangolo.com/)
 
 * Get help
 
