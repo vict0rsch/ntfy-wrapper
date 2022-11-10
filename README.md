@@ -97,31 +97,31 @@ if __name__ == "__main__":
     $ py-ntfy init
     🔑 Your first topic is `f8e34b7a-74a3-49e7-96fc-4d89eaf6ea6c`.
     Use it to subscribe to notifications!
-    � Config file created at /path/to/repo/.ntfy.conf
+    🎉 Config file created at /path/to/repo/.ntfy.conf
     ```
 
 * Add a topic or an email
 
     ```bash
     $ py-ntfy add topic some-secret-string-for-your-topic
-    � Topic `some-secret-string-for-your-topic` added to /path/to/repo/.ntfy.conf
+    🎉 Topic `some-secret-string-for-your-topic` added to /path/to/repo/.ntfy.conf
 
     $ py-ntfy add email you@foo.bar
-    � Email you@foo.bar added to /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
+    🎉 Email you@foo.bar added to /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
     ```
 
 * Add a default value for the `.notify(...)` calls
 
     ```bash
     $ py-ntfy add default key value
-    � Default key=value added to /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
+    🎉 Default key=value added to /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
     ```
 
 * Remove items by simply replacing `add` by `remove`
 
     ```bash
     $ py-ntfy remove default key
-    � Default key=value removed from /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
+    🎉 Default key=value removed from /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
 
     $ py-ntfy remove email hello@you.com
     Email hello@you.com does not exist. Ignoring.
