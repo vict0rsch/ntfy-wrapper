@@ -68,7 +68,7 @@ The central concept is **"topics"**. It's basically an ID publish/subscribe to n
 
 * On your computer
   * By opening a [local web app](https://ntfy.sh/app)
-    <img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/ntfy-txt.png" height="300">
+    <img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/webapp.png" height="300">
   * By setting up the [`ntfy` CLI tool](https://ntfy.sh/docs/subscribe/cli/)
 * On your phone
   * By installing [a mobile app](https://ntfy.sh/docs/subscribe/phone/)
