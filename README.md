@@ -21,11 +21,17 @@ Again, all credit to [`ntfy`](https://ntfy.sh).
 
 ## Install
 
-Install `ntfy-wrapper` (and its 2 dependencies: `requests` and `typer`) with `pip`:
+Install `ntfy-wrapper` with `pip`:
 
 ```bash
 pip install ntfy-wrapper
 ```
+
+Dependencies:
+
+* `requests` for easy HTTP requests and interacting with the `ntfy.sh` API
+* `typer` for a powerful and beautiful CLI
+* `xkcdpass` to generate secure but human-friendly topics[^1]
 
 ## How to use
 
@@ -66,29 +72,32 @@ if __name__ == "__main__":
     $ py-ntfy --help
     Usage: py-ntfy [OPTIONS] COMMAND [ARGS]...
 
-    ╭─ Options ─────────────────────────────────────────────────────────────────────╮
-    │ --install-completion          Install completion for the current shell.       │
-    │ --show-completion             Show completion for the current shell, to copy  │
-    │                               it or customize the installation.               │
-    │ --help                        Show this message and exit.                     │
-    ╰───────────────────────────────────────────────────────────────────────────────╯
-    ╭─ Commands ────────────────────────────────────────────────────────────────────╮
-    │ add     [command sub-group] Add a new notification target or a default        │
-    │         notification value. Run `$ py-ntfy add --help` for more info.         │
-    │ clean   Removes the configuration file. Use --conf-path to specify a path to  │
-    │         the configuration file. Use --force to skip the confirmation prompt.  │
-    │ init    Initializes the configuration file. It should NOT be tracked by       │
-    │         version control in order to protect the topic ID. Use --conf-path to  │
-    │         specify a path to the configuration file. Use --force to overwrite an │
-    │         existing configuration file.                                          │
-    │ remove  [command sub-group] Remove a notification target or a default         │
-    │         notification value. Run `$ py-ntfy remove --help` for more info.      │
-    │ send    Sends a notification to the given emails and topics. Optional         │
-    │         command-line arguments can be passed to override the defaults in the  │
-    │         config file and customize the message options. Refer to               │
-    │         https://ntfy.sh/docs/publish to understand the options. Run           │
-    │         `py-ntfy send --help` to see the available options.                   │
-    ╰───────────────────────────────────────────────────────────────────────────────╯
+    ╭─ Options ────────────────────────────────────────────────────────────────────╮
+    │ --install-completion          Install completion for the current shell.      │
+    │ --show-completion             Show completion for the current shell, to copy │
+    │                               it or customize the installation.              │
+    │ --help                        Show this message and exit.                    │
+    ╰──────────────────────────────────────────────────────────────────────────────╯
+    ╭─ Commands ───────────────────────────────────────────────────────────────────╮
+    │ add        [command sub-group] Add a new notification target or a default    │
+    │            notification value. Run `$ py-ntfy add --help` for more info.     │
+    │ clean      Removes the configuration file. Use --conf-path to specify a path │
+    │            to the configuration file. Use --force to skip the confirmation   │
+    │            prompt.                                                           │
+    │ init       Initializes the configuration file. It should NOT be tracked by   │
+    │            version control in order to protect the topic ID. Use --conf-path │
+    │            to specify a path to the configuration file. Use --force to       │
+    │            overwrite an existing configuration file.                         │
+    │ new-topic  Generates a random topic name and saves it to the config file if  │
+    │            you use the --save option.                                        │
+    │ remove     [command sub-group] Remove a notification target or a default     │
+    │            notification value. Run `$ py-ntfy remove --help` for more info.  │
+    │ send       Sends a notification to the given emails and topics. Optional     │
+    │            command-line arguments can be passed to override the defaults in  │
+    │            the config file and customize the message options. Refer to       │
+    │            https://ntfy.sh/docs/publish to understand the options. Run       │
+    │            `py-ntfy send --help` to see the available options.               │
+    ╰──────────────────────────────────────────────────────────────────────────────╯
 
     $ py-ntfy add --help
     (similar output)
@@ -104,8 +113,7 @@ if __name__ == "__main__":
 
     ```bash
     $ py-ntfy init
-    🔑 Your first topic is `f8e34b7a-74a3-49e7-96fc-4d89eaf6ea6c`.
-    Use it to subscribe to notifications!
+    🔑 Your first topic is `aloe-corset-stream-alto`. Use it to subscribe to notifications!
     🎉 Config file created at /path/to/repo/.ntfy.conf
     ```
 
@@ -136,11 +144,19 @@ if __name__ == "__main__":
     Email hello@you.com does not exist. Ignoring.
     ```
 
+* Generate a new topic with `new-topic` and add it to your configuration with `--save`
+
+    ```bash
+    $ py-ntfy new-topic --save
+    🎉 Topic nutty-tiling-clear-parlor added to /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
+
+    ```
+
 * Send a notification from the command-line with `send`
 
     ```bash
-    $ py-ntfy send "hello" --topics 99e89137-c3a3-47fd-a616-01677b15c5b7 --title "This is Victor" --click "https://9gag.com"
-    🎉 Notification sent to 99e89137-c3a3-47fd-a616-01677b15c5b7, you@foo.bar
+    $ py-ntfy send "hello" --topics frays-errant-acting-huddle --title "This is Victor" --click "https://9gag.com"
+    🎉 Notification sent to frays-errant-acting-huddle, you@foo.bar
     ```
 
 * Change the default configuration path for any command with the option `--conf-path`
@@ -153,3 +169,9 @@ if __name__ == "__main__":
 * [x] CLI
 * [ ] Screenshots
 * [ ] `requests` timeout or non-blocking
+
+---
+
+[^1]: cf [xkcd936](https://xkcd.com/936/)
+
+![xkcd936](https://imgs.xkcd.com/comics/password_strength.png)
