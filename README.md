@@ -33,7 +33,7 @@ Dependencies:
 * `typer` for a powerful and beautiful CLI
 * `xkcdpass` to generate secure but human-friendly topics[^1]
 
-## How to use
+## Getting Started
 
 ```python
 from ntfy_wrapper import Notifier
@@ -62,16 +62,38 @@ if __name__ == "__main__":
         ntfy.notify(f"Error! -> {str(e)}", priority=4, emails="you@foo.bar")
 ```
 
-## How it works
+## User Guide
 
-The central concept is **"topics"**. It's basically an ID publish/subscribe to notifications. In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscribe* to that same topic in order to receive the notification. You can receive your notification:
+The central concept is **"topics"**. It's basically an ID used to publish/subscribe to notifications. You should keep it secret and not easily guessable because ***anyone with the topic id can subscribe to your notifications***. In particular, you should add `.ntfy.conf` to `.gitignore`.
+
+In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscribe* to that same topic in order to receive the notification. You can receive your notification:
 
 * On your computer
-  * By opening a [local web app](https://ntfy.sh/app)
-    <img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/webapp.png" height="300">
+  * By opening a [local web app](https://ntfy.sh/app) <img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/webapp.png" height="400">
   * By setting up the [`ntfy` CLI tool](https://ntfy.sh/docs/subscribe/cli/)
 * On your phone
   * By installing [a mobile app](https://ntfy.sh/docs/subscribe/phone/)
+
+### How to use
+
+1. Create topics in one of the following ways:
+   1. configure one manually
+   2. In a Python console use `ntfy_wrapper.utils.generate_topic()` to get a secure unique and human-readable topic (eg: `winter-abide-dinghy-wand`)
+   3. From the command-line use `$ py-ntfy new-topic` to get a similar topic. Add `--save` to add it to the configuration.
+2. Tell the `Notifier` to use this topic in one of the following ways:
+   1. In your code `Notifier(topics=your_topic)` or `Notifier(topics=[topic1, topic2])`
+   2. Using a **configuration file**
+      1. A configuration file will be created by default when constructing a `Notifier` *except* is you add `write=False`
+      2. The configuration file is used to hold default values for:
+         1. `targets`, i.e. a list of comma-separated `topics` and a list of comma-separated `emails`
+         2. `message_defaults` which are default values used when calling `.notify(...)`
+      3. You can also use `$ py-ntfy init` to initialize your `ntfy-wrapper` configuration
+   3. From the command-line with `$ py-ntfy add topic your-topic`
+3. Setup defaults in one of the following ways
+   1. By editing the config file
+   2. By using the [`py-ntfy` command-line tool](#command-line)
+
+
 
 ## Command-line
 
