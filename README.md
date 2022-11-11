@@ -62,9 +62,20 @@ if __name__ == "__main__":
         ntfy.notify(f"Error! -> {str(e)}", priority=4, emails="you@foo.bar")
 ```
 
-### Command-line
+## How it works
 
-`ntfy_wrapper` comes with a command-line interface called `py-ntfy`. It uses the great Python CLI tool [`Typer`](https://typer.tiangolo.com/)
+The central concept is **"topics"**. It's basically an ID publish/subscribe to notifications. In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscribe* to that same topic in order to receive the notification. You can receive your notification:
+
+* On your computer
+  * By opening a [local web app](https://ntfy.sh/app)
+    <img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/ntfy-txt.png" height="300">
+  * By setting up the [`ntfy` CLI tool](https://ntfy.sh/docs/subscribe/cli/)
+* On your phone
+  * By installing [a mobile app](https://ntfy.sh/docs/subscribe/phone/)
+
+## Command-line
+
+`ntfy_wrapper` comes with a command-line interface called `py-ntfy`. It uses the great Python CLI tool [`Typer`](https://typer.tiangolo.com/). Its goal is to interact with `ntfy-wrapper`'s configuration in a user-friendly way. It is different in that sense to the original [`ntfy` CLI tool](https://ntfy.sh/docs/subscribe/cli/) which is more generic.
 
 * Get help
 
@@ -172,7 +183,7 @@ if __name__ == "__main__":
 <br/>
 
 ---
-        
+
 <br/>
 
 [^1]: cf [xkcd936](https://xkcd.com/936/)
