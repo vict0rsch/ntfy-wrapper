@@ -69,7 +69,7 @@ The central concept is **"topics"**. It's basically an ID used to publish/subscr
 In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscribe* to that same topic in order to receive the notification. You can receive your notification:
 
 * On your computer
-  * By opening a [local web app](https://ntfy.sh/app) <img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/webapp.png" height="400">
+  * By opening a [local web app](https://ntfy.sh/app) <a href="https://ntfy.sh/app"><img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/webapp.png" height="400"></a>
   * By setting up the [`ntfy` CLI tool](https://ntfy.sh/docs/subscribe/cli/)
 * On your phone
   * By installing [a mobile app](https://ntfy.sh/docs/subscribe/phone/)
@@ -83,7 +83,7 @@ In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscri
 2. Tell the `Notifier` to use this topic in one of the following ways:
    1. In your code `Notifier(topics=your_topic)` or `Notifier(topics=[topic1, topic2])`
    2. Using a **configuration file**
-      1. A configuration file will be created by default when constructing a `Notifier` *except* is you add `write=False`
+      1. A configuration file will be created by default when constructing a `Notifier` *except* if you add `write=False` to the `Notifier.__init__` arguments
       2. The configuration file is used to hold default values for:
          1. `targets`, i.e. a list of comma-separated `topics` and a list of comma-separated `emails`
          2. `message_defaults` which are default values used when calling `.notify(...)`
@@ -92,8 +92,9 @@ In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscri
 3. Setup defaults in one of the following ways
    1. By editing the config file
    2. By using the [`py-ntfy` command-line tool](#command-line)
+4. Explore notification options by referring to the original [`ntfy` docs](https://ntfy.sh/docs/publish/)
 
-
+<a href="https://ntfy.sh/app"><img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/mermaid.png"></a>
 
 ## Command-line
 
