@@ -169,8 +169,12 @@ if __name__ == "__main__":
 * [ ] Screenshots
 * [ ] `requests` timeout or non-blocking
 
+<br/>
+
 ---
+        
+<br/>
 
 [^1]: cf [xkcd936](https://xkcd.com/936/)
 
-![xkcd936](https://imgs.xkcd.com/comics/password_strength.png)
+<p align="center"><img src="https://imgs.xkcd.com/comics/password_strength.png"></p>
