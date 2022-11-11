@@ -34,6 +34,12 @@ Dependencies:
 * `typer` for a powerful and beautiful CLI
 * `xkcdpass` to generate secure but human-friendly topics[^1]
 
+## Why?
+
+Imagine you execute jobs on a shared cluster. They are in a queue. You get notified when they start. You get notified if there's an error. You get notified with the final performance of your model and if you click on the notification, you have access to the online logs from wandb or comet.ml.
+
+That's just one scenario inspired from my work in AI, but really you can use it in any context!
+
 ## Getting Started
 
 ```python
