@@ -72,32 +72,31 @@ if __name__ == "__main__":
     $ py-ntfy --help
     Usage: py-ntfy [OPTIONS] COMMAND [ARGS]...
 
-    ╭─ Options ────────────────────────────────────────────────────────────────────╮
-    │ --install-completion          Install completion for the current shell.      │
-    │ --show-completion             Show completion for the current shell, to copy │
-    │                               it or customize the installation.              │
-    │ --help                        Show this message and exit.                    │
-    ╰──────────────────────────────────────────────────────────────────────────────╯
-    ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-    │ add        [command sub-group] Add a new notification target or a default    │
-    │            notification value. Run `$ py-ntfy add --help` for more info.     │
-    │ clean      Removes the configuration file. Use --conf-path to specify a path │
-    │            to the configuration file. Use --force to skip the confirmation   │
-    │            prompt.                                                           │
-    │ init       Initializes the configuration file. It should NOT be tracked by   │
-    │            version control in order to protect the topic ID. Use --conf-path │
-    │            to specify a path to the configuration file. Use --force to       │
-    │            overwrite an existing configuration file.                         │
-    │ new-topic  Generates a random topic name and saves it to the config file if  │
-    │            you use the --save option.                                        │
-    │ remove     [command sub-group] Remove a notification target or a default     │
-    │            notification value. Run `$ py-ntfy remove --help` for more info.  │
-    │ send       Sends a notification to the given emails and topics. Optional     │
-    │            command-line arguments can be passed to override the defaults in  │
-    │            the config file and customize the message options. Refer to       │
-    │            https://ntfy.sh/docs/publish to understand the options. Run       │
-    │            `py-ntfy send --help` to see the available options.               │
-    ╰──────────────────────────────────────────────────────────────────────────────╯
+    ╭─ Options ────────────────────────────────────────────────────────────────────────────────╮
+    │ --install-completion          Install completion for the current shell.                  │
+    │ --show-completion             Show completion for the current shell, to copy it or       │
+    │                               customize the installation.                                │
+    │ --help                        Show this message and exit.                                │
+    ╰──────────────────────────────────────────────────────────────────────────────────────────╯
+    ╭─ Commands ───────────────────────────────────────────────────────────────────────────────╮
+    │ add        [command sub-group] Add a new notification target or a default notification   │
+    │            value. Run `$ py-ntfy add --help` for more info.                              │
+    │ clean      Removes the configuration file. Use --conf-path to specify a path to the      │
+    │            configuration file. Use --force to skip the confirmation prompt.              │
+    │ init       Initializes the configuration file. It should NOT be tracked by version       │
+    │            control in order to protect the topic ID. Use --conf-path to specify a path   │
+    │            to the configuration file. Use --force to overwrite an existing configuration │
+    │            file.                                                                         │
+    │ new-topic  Generates a random topic name and saves it to the config file if you use the  │
+    │            --save option.                                                                │
+    │ remove     [command sub-group] Remove a notification target or a default notification    │
+    │            value. Run `$ py-ntfy remove --help` for more info.                           │
+    │ send       Sends a notification to the given emails and topics. Optional command-line    │
+    │            arguments can be passed to override the defaults in the config file and       │
+    │            customize the message options. Refer to https://ntfy.sh/docs/publish to       │
+    │            understand the options. Run `py-ntfy send --help` to see the available        │
+    │            options.                                                                      │
+    ╰──────────────────────────────────────────────────────────────────────────────────────────╯
 
     $ py-ntfy add --help
     (similar output)
