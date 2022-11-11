@@ -102,6 +102,7 @@ In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscri
 
 1. `[notifier_init]` with optional fields `emails = ` and `topics = ` to define systematic targets for the notification instead of putting them in your Python code
 2. `[notify_defaults]` with optional fields listed below, which will define default parameters used by `Notifier.notify(...)`. For instance you can set default `title` and `tags` for your code's `.notify(...)` calls and override them at specific locations with keyword arguments `.notify(title="Non-default title")`
+   1. The behavior of the `title`, `priority`, `tags`, `click`, `attach`, `actions` and `icon` keys is described in the [`ntfy` docs](https://ntfy.sh/docs/publish/)
 
 ```ini
 # For Notifier(emails=..., topics=...)
