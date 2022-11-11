@@ -286,11 +286,18 @@ def new_topic(save: Optional[bool] = False):
         emails = conf.pop("emails", [])
         if topic not in topics:
             topics.append(topic)
-            write_conf(conf_path, topics, emails, conf)
-            print(
-                f"🎉 Topic {code(topic)} added to {code(conf_path)}",
-                style="green",
-            )
+            if not conf_path.exists():
+                confirm = typer.confirm(
+                    "Config file not found. Do you want to create it?"
+                )
+                if confirm:
+                    write_conf(conf_path, topics, emails, conf)
+                    print(
+                        f"🎉 Topic {code(topic)} added to {code(conf_path)}",
+                        style="green",
+                    )
+                else:
+                    typer.Abort()
     else:
         print(f"🎉 Topic: {code(topic)}", style="green")
 
