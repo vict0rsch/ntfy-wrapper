@@ -5,9 +5,10 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://pypi.org/project/ntfy-wrapper/"><img src="https://badge.fury.io/py/ntfy-wrapper.svg" alt="PyPI version" height="18"></a>
+    <a href="https://pypi.org/project/ntfy-wrapper/"><img src="https://img.shields.io/badge/pypi%20package-0.1.2-blue" alt="PyPI version" height="18"></a>
     <a href="https://ntfy-wrapper.readthedocs.io/en/latest/index.html"><img src="https://img.shields.io/badge/docs-read%20the%20docs-blue" alt="PyPI version" height="18"></a>
     <a href="https://github.com/vict0rsch/ntfy-wrapper/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc"><img src="https://img.shields.io/github/issues-raw/vict0rsch/ntfy-wrapper" alt="Open Issues" height="18"></a>
+    <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/codestyle-black-red" alt="Black code style" height="18"></a>
     <a href="https://github.com/vict0rsch/ntfy-wrapper/blob/main/LICENSE><img src="https://img.shields.io/github/license/vict0rsch/ntfy-wrapper" alt="License" height="18"></a>
 </p>
 
