@@ -11,6 +11,7 @@ packages = [{include = "ntfy_wrapper"}]
 python = "^3.9"
 requests = "^2.28.1"
 typer = {extras = ["all"], version = "^0.7.0"}
+xkcdpass = "^1.19.3"
 
 
 [tool.poetry.group.dev.dependencies]
