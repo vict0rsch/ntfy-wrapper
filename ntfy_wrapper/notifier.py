@@ -3,11 +3,10 @@ Main class for ntfy-wrapper.
 """
 from pathlib import Path
 from typing import Dict, List, Optional, Union
-from uuid import uuid4
 
 import requests
 
-from ntfy_wrapper.utils import get_conf_path, load_conf, write_conf
+from ntfy_wrapper.utils import generate_topic, get_conf_path, load_conf, write_conf
 
 
 class Notifier:
@@ -84,7 +83,7 @@ class Notifier:
         # that can be overwritten by the user in the conf or the init args
         conf = load_conf(self.conf_path)
         conf.update(defaults)
-        conf_topics = conf.pop("topics", [str(uuid4())])
+        conf_topics = conf.pop("topics", [generate_topic()])
         conf_emails = conf.pop("emails", [])
 
         if self.topics is None:
