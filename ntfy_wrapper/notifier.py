@@ -2,7 +2,7 @@
 Main class for ntfy-wrapper.
 """
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 
 import requests
 
@@ -13,6 +13,7 @@ from ntfy_wrapper.utils import (
     write_conf,
     code,
     print,
+    KEYS,
 )
 
 
@@ -26,7 +27,7 @@ class Notifier:
         self,
         topics: Optional[Union[str, List[str]]] = None,
         emails: Optional[Union[str, List[str]]] = None,
-        defaults: Optional[Dict] = {},
+        notify_defaults: Optional[Dict] = {},
         conf_path: Optional[Union[str, Path]] = None,
         write: Optional[bool] = True,
         warnings: Optional[bool] = True,
@@ -61,7 +62,7 @@ class Notifier:
                 strings describing the emails to send notifications to by default.
                 Be aware of the rate limits: https://ntfy.sh/docs/publish/#limitations
                 Defaults to None.
-            defaults (Optional[Dict], optional): Dict whose keys and values will be
+            notify_defaults (Optional[Dict], optional): Dict whose keys and values will be
                 default keyword arguments for the ``Notifier.notify()`` method so that
                 you don't have to write the same stuff again and again throughout
                 your code. Defaults to {}.
@@ -77,11 +78,15 @@ class Notifier:
                 its initialization from your args and the (potentially non-existing)
                 conf. Defaults to True.
         """
+
         if isinstance(topics, str):
             topics = [topics]
 
-        self.topics = topics
-        self.emails = emails
+        assert isinstance(notify_defaults, dict), "notify_defaults must be a dict"
+        assert all(
+            k in KEYS["notify_defaults"] for k in notify_defaults.keys()
+        ), "notify_defaults keys must be in " + str(KEYS["notify_defaults"])
+
         # cwd/.ntfy.conf if conf_path is None
         self.conf_path = get_conf_path(conf_path)
         self.warnings = warnings
@@ -89,32 +94,29 @@ class Notifier:
         # otherwise, gets initialized with default values
         # that can be overwritten by the user in the conf or the init args
         conf = load_conf(self.conf_path)
-        conf.update(defaults)
-        conf_topics = conf.pop("topics", None)
-        conf_emails = conf.pop("emails", [])
+        conf.update(notify_defaults)
+        if topics is not None:
+            conf["topics"] = topics
+        if emails is not None:
+            conf["emails"] = emails
 
-        if self.topics is None:
-            if self.emails is None and not conf_topics:
+        self.conf = conf
+
+        if not self.conf.get("topics"):
+            if not self.conf.get("emails"):
                 self._warn(
                     "No topic set, and no email set."
                     + " Creating a random topic for you."
                 )
-            if not conf_topics:
-                conf_topics = [generate_topic()]
-            self.topics = conf_topics
-
-        if self.emails is None:
-            self.emails = conf_emails
-
-        self.defaults = conf
+                self.conf["topics"] = [generate_topic()]
 
         if write:
             # save the config file
             self.write_to_conf()
 
-        assert (
-            self.topics or self.emails
-        ), "You must specify at least one topic or email"
+        assert self.conf.get("topics") or self.conf.get("emails"), (
+            "You must specify at least one topic or email.\n" + self.describe()
+        )
 
         if verbose:
             self.describe()
@@ -133,17 +135,24 @@ class Notifier:
         """
         Describe the notifier.
         """
-        if self.topics:
+        if self.conf.get("topics"):
             print(
                 f"📬 {code('Notifier')} will push to topics: "
-                + ", ".join([code(t) for t in self.topics])
+                + ", ".join([code(t) for t in self.conf["topics"]])
             )
-        if self.emails:
+        if self.conf.get("emails"):
             print(
                 "📧 Notifier will send emails to: "
-                + ", ".join([code(e) for e in self.emails])
+                + ", ".join([code(e) for e in self.conf["emails"]])
             )
-        print("🛠  Its configuration is in: " + code(self.conf_path))
+        keys = [k for k in self.conf.keys() if k not in ["topics", "emails"]]
+        if keys:
+            ml = max([len(k) for k in keys])
+            print(f"🛠  {code('Notifier.notify(..)')} defaults:")
+            for k in keys:
+                print(f"  • {code(k):{ml+13}} -> {code(self.conf[k])}")
+        print("🗃  Its configuration is in: " + code(self.conf_path))
+        return ""
 
     def remove_topics(
         self,
@@ -161,10 +170,10 @@ class Notifier:
                 Defaults to True.
         """
         for t in topics:
-            if t not in self.topics:
+            if t not in self.conf.get("topics", []):
                 self._warn(f"Topic {t} is not in the list of topics")
             else:
-                self.topics.remove(t)
+                self.conf["topics"].remove(t)
         if write:
             self.write_to_conf()
 
@@ -184,10 +193,10 @@ class Notifier:
                 Defaults to True.
         """
         for e in emails:
-            if e not in self.emails:
+            if e not in self.conf.get("emails", []):
                 self._warn(f"Email {e} is not in the list of emails")
             else:
-                self.emails.remove(e)
+                self.conf["emails"].remove(e)
         if write:
             self.write_to_conf()
 
@@ -200,7 +209,7 @@ class Notifier:
             write (Optional[bool], optional): Whether to update the config file or not.
                 Defaults to True.
         """
-        self.topics = []
+        self.conf["topics"] = []
         if write:
             self.write_to_conf()
 
@@ -213,7 +222,7 @@ class Notifier:
             write (Optional[bool], optional): Whether to update the config file or not.
                 Defaults to True.
         """
-        self.emails = []
+        self.conf["emails"] = []
         if write:
             self.write_to_conf()
 
@@ -222,13 +231,49 @@ class Notifier:
         Write the topics to the configuration file.
         """
         self._warn(
-            "⚠️ Warning: your configuration may contain sensitive data. "
+            "❗️ Warning: your configuration may contain sensitive data. "
             + "Make sure it is ignored by your version control system "
             + f"(in {code('.gitignore')} for instance)."
             + f" Use {code('warnings=False')} in {code('Notifier.__init__')}"
             + " to disable this warning."
         )
-        write_conf(self.conf_path, self.topics, self.emails, self.defaults)
+        write_conf(self.conf_path, self.conf)
+
+    def update_notify_defaults(
+        self, notify_defaults: Dict[str, Any], write: bool = True
+    ):
+        """
+        Add notify defaults to the Notifier's configuration.
+        If a key already exists, it is overwritten.
+
+        Args:
+            notify_defaults (Dict[str, Any]): The notify defaults to add.
+        """
+        assert isinstance(notify_defaults, dict), "notify_defaults must be a dict"
+        assert all(
+            k in KEYS["notify_defaults"] for k in notify_defaults.keys()
+        ), "notify_defaults keys must be in " + str(KEYS["notify_defaults"])
+        self.conf.update(notify_defaults)
+        if write:
+            self.write_to_conf()
+
+    def remove_notify_defaults(self, notify_defaults: List[str], write: bool = True):
+        """
+        Remove notify defaults from the Notifier's configuration.
+        If a key does not exist, it is ignored.
+
+        Args:
+            notify_defaults (List[str]): The notify defaults to remove.
+        """
+        assert isinstance(notify_defaults, list), "notify_defaults must be a list"
+        assert all(
+            k in KEYS["notify_defaults"] for k in notify_defaults
+        ), "notify_defaults keys must be in " + str(KEYS["notify_defaults"])
+        for k in notify_defaults:
+            if k in self.conf:
+                del self.conf[k]
+        if write:
+            self.write_to_conf()
 
     def notify(
         self,
@@ -292,7 +337,8 @@ class Notifier:
             List[str]: A list of the urls the notifications have been dispatched to:
                 one for each topic and one for each email.
         """
-        headers = {**self.defaults, "priority": priority}
+        defaults = {k: v for k, v in self.conf.items() if k not in {"topics", "emails"}}
+        headers = {**defaults, "priority": priority}
 
         if attach and message:
             raise ValueError("You cannot specify both `attach` and `message`")
@@ -326,19 +372,16 @@ class Notifier:
         if emails is not None:
             if isinstance(emails, str):
                 emails = [emails]
-            assert isinstance(emails, list)
         else:
-            if self.emails:
-                emails = self.emails
-            else:
-                emails = [None]
+            emails = self.conf.get("emails", [])
 
-        if topics is None:
-            topics = self.topics
-        else:
+        if topics is not None:
             if isinstance(topics, str):
                 topics = [topics]
+        else:
+            topics = self.conf.get("topics", [])
 
+        assert isinstance(emails, list)
         assert isinstance(topics, list)
 
         dispatchs = []

@@ -2,8 +2,9 @@
 A module containing utility functions for ntfy-wrapper.
 """
 import configparser
+from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Any
+from typing import Any, Dict, List, Optional, Union
 
 from rich.console import Console
 from rich.theme import Theme
@@ -11,34 +12,51 @@ from xkcdpass import xkcd_password as xp
 
 custom_theme = Theme({"code": "grey70 bold italic"})
 print = Console(theme=custom_theme).print
+KEYS = {
+    "notifier_init": {"topics", "emails"},
+    "notify_defaults": {
+        "message",
+        "topics",
+        "emails",
+        "title",
+        "priority",
+        "tags",
+        "click",
+        "attach",
+        "actions",
+        "icon",
+    },
+}
 
 
 DOCSTRING = """
 This INI config file contains 2 sections:
-[targets], and [message_defaults].
-Values in [targets] can be strings or lists of strings (comma separated).
-Values in [message_defaults] can be best understood from the ntfy documentation:
+[notifier_init], and [notify_defaults].
+Values in [notifier_init] can be strings or lists of strings (comma separated).
+Values in [notify_defaults] can be best understood from the ntfy documentation:
 https://ntfy.sh/docs/publish/
 ⚠️
-Nota Bene: the 'topic' is kind of a password: anyone with
-The topic ID can send messages to your device, so protect it and make
-sure to remove this config file from the version control system.
+Nota Bene: a 'topic' is kind of a password: anyone with The topic id can send messages
+to your device, so protect it and make sure to remove this config file from the version
+control system.
 ⇩
 Example:
----------------------------------------
-[targets]
-topics: my-secret-topic-1, mysecrettopic2
-emails: you@foo.bar
-#
-[message_defaults]
-title=
-priority=
-tags=
-click=
-attach=
-actions=
-icon=
-----------------------------------------
+-----------------------------------------------------------------------------------------
+# For Notifier(emails=..., topics=...)
+[notifier_init]
+topics = my-secret-topic-1, mysecrettopic2
+emails = you@foo.bar
+
+# For Notifier.notify(title=..., priority=..., etc.)
+[notify_defaults]
+title = Message from ntfy-wrapper
+priority = 0
+tags = fire
+click =
+attach =
+actions =
+icon = https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/logo.png
+----------------------------------------------------------------------------------------
 """
 
 
@@ -86,17 +104,17 @@ def load_conf(conf_path: Optional[Union[str, Path]] = None) -> dict:
         config = configparser.ConfigParser()
         config.read(path)
         conf = {}
-        if config.has_section("targets"):
-            if "topics" in config["targets"]:
+        if config.has_section("notifier_init"):
+            if "topics" in config["notifier_init"]:
                 conf["topics"] = [
-                    t.strip() for t in config.get("targets", "topics").split(",")
+                    t.strip() for t in config.get("notifier_init", "topics").split(",")
                 ]
-            if "emails" in config["targets"]:
+            if "emails" in config["notifier_init"]:
                 conf["emails"] = [
-                    e.strip() for e in config.get("targets", "emails").split(",")
+                    e.strip() for e in config.get("notifier_init", "emails").split(",")
                 ]
-        if config.has_section("message_defaults"):
-            conf.update(dict(config["message_defaults"]))
+        if config.has_section("notify_defaults"):
+            conf.update(dict(config["notify_defaults"]))
         return conf
 
     return {
@@ -108,9 +126,7 @@ def load_conf(conf_path: Optional[Union[str, Path]] = None) -> dict:
 
 def write_conf(
     conf_path: Path,
-    topics: Optional[List] = [],
-    emails: Optional[List] = [],
-    defaults: Optional[Dict] = {},
+    conf: Dict[str, Union[str, List[str]]],
 ) -> None:
     """
     Write the configuration file as an INI file.
@@ -118,23 +134,27 @@ def write_conf(
 
     Args:
         conf_path (Path): The path to the configuration file.
-        topics (Optional[List], optional): Topics to record . Defaults to [].
-        emails (Optional[List], optional): Emails to record. Defaults to [].
-        defaults (Optional[Dict], optional): Additional message defaults.
-            Defaults to {}.
+        conf (Dict[str, Union[str, List[str]]]): The configuration to write.
     """
+    conf = deepcopy(conf)
+    topics = conf.pop("topics", None)
+    emails = conf.pop("emails", None)
+
     config = configparser.ConfigParser(allow_no_value=True)
+
     config.add_section("about")
     for line in DOCSTRING.split("\n")[1:]:
         config.set("about", ("# " + line).strip())
-    config.add_section("targets")
+
+    config.add_section("notifier_init")
     if topics:
-        config.set("targets", "topics", ",".join(topics))
+        config.set("notifier_init", "topics", ",".join(topics))
     if emails:
-        config.set("targets", "emails", ",".join(emails))
-    config.add_section("message_defaults")
-    for k, v in defaults.items():
-        config.set("message_defaults", k, v)
+        config.set("notifier_init", "emails", ",".join(emails))
+
+    config.add_section("notify_defaults")
+    for k, v in conf.items():
+        config.set("notify_defaults", k, v)
 
     config.write(conf_path.open("w"))
 

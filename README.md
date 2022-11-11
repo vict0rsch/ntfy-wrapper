@@ -96,6 +96,30 @@ In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscri
 
 <a href="https://ntfy.sh/app"><img src="https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/mermaid.png"></a>
 
+## Configuration file
+
+`ntfy-wrapper` uses the INI standard along with `configparser` to parse the configuration file. It expects 2 sections:
+
+1. `[notifier_init]` with optional fields `emails = ` and `topics = ` to define systematic targets for the notification instead of putting them in your Python code
+2. `[notify_defaults]` with optional fields listed below, which will define default parameters used by `Notifier.notify(...)`. For instance you can set default `title` and `tags` for your code's `.notify(...)` calls and override them at specific locations with keyword arguments `.notify(title="Non-default title")`
+
+```ini
+# For Notifier(emails=..., topics=...)
+[notifier_init]
+topics = my-secret-topic-1, mysecrettopic2
+emails = you@foo.bar
+
+# For Notifier.notify(title=..., priority=..., etc.)
+[notify_defaults]
+title = Message from ntfy-wrapper
+priority = 0
+tags = fire
+click =
+attach =
+actions =
+icon = https://raw.githubusercontent.com/vict0rsch/ntfy-wrapper/main/assets/logo.png
+```
+
 ## Command-line
 
 `ntfy_wrapper` comes with a command-line interface called `py-ntfy`. It uses the great Python CLI tool [`Typer`](https://typer.tiangolo.com/). Its goal is to interact with `ntfy-wrapper`'s configuration in a user-friendly way. It is different in that sense to the original [`ntfy` CLI tool](https://ntfy.sh/docs/subscribe/cli/) which is more generic.
@@ -182,7 +206,6 @@ In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscri
     ```bash
     $ py-ntfy new-topic --save
     🎉 Topic nutty-tiling-clear-parlor added to /Users/.../vict0rsch/ntfy-wrapper/.ntfy.conf
-
     ```
 
 * Send a notification from the command-line with `send`

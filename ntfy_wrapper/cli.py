@@ -14,6 +14,7 @@ from ntfy_wrapper.utils import (
     code,
     print,
     get_conf_path,
+    KEYS,
 )
 
 
@@ -48,13 +49,7 @@ def init(conf_path: Optional[str] = None, force: bool = False):
         raise typer.Abort()
     topic = generate_topic()
     base_conf = load_conf()
-    base_conf.pop("emails", None)
-    base_conf.pop("topics", None)
-    write_conf(
-        conf_path,
-        topics=[topic],
-        defaults=base_conf,
-    )
+    write_conf(conf_path, base_conf)
     print(
         f"🔑 Your first topic is {code(topic)}."
         + " Use it to subscribe to notifications!",
@@ -93,15 +88,17 @@ def add_topic(topic: str, conf_path: Optional[str] = None):
     """
     conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
-        raise typer.Abort(f"Config file not found at {str(conf_path)}")
+        raise typer.BadParameter(f"Config file not found at {str(conf_path)}")
     conf = load_conf(conf_path)
-    topics = conf.pop("topics", [])
+    topics = conf.get("topics", [])
     if topic not in topics:
         topics.append(topic)
+        conf["topics"] = topics
     else:
         print(f"Topic {topic} already exists.")
         raise typer.Abort()
-    write_conf(conf_path, topics, conf.pop("emails", None), conf)
+
+    write_conf(conf_path, conf)
     print(f"🎉 Topic {code(topic)} added to {code(conf_path)}", style="green")
 
 
@@ -115,13 +112,14 @@ def add_email(email: str, conf_path: Optional[str] = None):
     if not conf_path.exists():
         raise typer.Abort(f"Config file not found at {str(conf_path)}")
     conf = load_conf(conf_path)
-    emails = conf.pop("emails", [])
+    emails = conf.get("emails", [])
     if email not in emails:
         emails.append(email)
+        conf["emails"] = emails
     else:
         print(f"email {email} already exists.")
         raise typer.Abort()
-    write_conf(conf_path, conf.pop("topics", None), emails, conf)
+    write_conf(conf_path, conf)
     print(f"🎉 Email {code(email)} added to {code(conf_path)}", style="green")
 
 
@@ -131,9 +129,13 @@ def add_default(key: str, value: str, conf_path: Optional[str] = None):
     Adds a default to the config file.
     If --conf-path is not given, the current working directory will be used.
     """
+    if key not in KEYS["notify_defaults"]:
+        raise typer.BadParameter(
+            f"key must be one of {KEYS['notify_defaults']}, not '{key}'"
+        )
     conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
-        raise typer.Abort(f"Config file not found at {str(conf_path)}")
+        raise typer.BadParameter(f"Config file not found at {str(conf_path)}")
     conf = load_conf(conf_path)
     if key in conf:
         print(
@@ -141,7 +143,7 @@ def add_default(key: str, value: str, conf_path: Optional[str] = None):
             + "\nOverwriting.",
         )
     conf[key] = value
-    write_conf(conf_path, conf.pop("topics", None), conf.pop("emails", None), conf)
+    write_conf(conf_path, conf)
     print(
         f"🎉 Default {code(str(key)+'='+str(value))} added to {code(conf_path)}",
         style="green",
@@ -156,12 +158,13 @@ def remove_topic(topic: str, conf_path: Optional[str] = None):
     """
     conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
-        raise typer.Abort(f"Config file not found at {str(conf_path)}")
+        raise typer.BadParameter(f"Config file not found at {str(conf_path)}")
     conf = load_conf(conf_path)
-    topics = conf.pop("topics", [])
+    topics = conf.get("topics", [])
     if topic in topics:
         topics.remove(topic)
-        write_conf(conf_path, topics, conf.pop("emails", None), conf)
+        conf["topics"] = topics
+        write_conf(conf_path, conf)
         print(f"🎉 Topic {code(topic)} removed from {code(conf_path)}", style="green")
     else:
         print(f"Topic {code(topic)} does not exist. Ignoring.")
@@ -175,12 +178,13 @@ def remove_email(email: str, conf_path: Optional[str] = None):
     """
     conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
-        raise typer.Abort(f"Config file not found at {str(conf_path)}")
+        raise typer.BadParameter(f"Config file not found at {str(conf_path)}")
     conf = load_conf(conf_path)
-    emails = conf.pop("emails", [])
+    emails = conf.get("emails", [])
     if email in emails:
         emails.remove(email)
-        write_conf(conf_path, conf.pop("topics", None), emails, conf)
+        conf["emails"] = emails
+        write_conf(conf_path, conf)
         print(f"🎉 Email {code(email)} removed from {code(conf_path)}", style="green")
     else:
         print(f"Email {code(email)} does not exist. Ignoring.", style="yellow")
@@ -194,11 +198,11 @@ def remove_default(key: str, conf_path: Optional[str] = None):
     """
     conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
-        raise typer.Abort(f"Config file not found at {str(conf_path)}")
+        raise typer.BadParameter(f"Config file not found at {str(conf_path)}")
     conf = load_conf(conf_path)
     if key in conf:
         value = conf.pop(key)
-        write_conf(conf_path, conf.pop("topics", None), conf.pop("emails", None), conf)
+        write_conf(conf_path, conf)
         print(
             f"🎉 Default {code(str(key)+'='+str(value))} removed from {code(conf_path)}",
             style="green",
@@ -282,21 +286,22 @@ def new_topic(save: Optional[bool] = False):
     if save:
         conf_path = get_conf_path()
         conf = load_conf(conf_path)
-        topics = conf.pop("topics", [])
-        emails = conf.pop("emails", [])
+        topics = conf.get("topics", [])
         if topic not in topics:
             topics.append(topic)
+            conf["topics"] = topics
             if not conf_path.exists():
                 confirm = typer.confirm(
                     "Config file not found. Do you want to create it?"
                 )
                 if confirm:
-                    write_conf(conf_path, topics, emails, conf)
+                    write_conf(conf_path, conf)
                     print(
                         f"🎉 Topic {code(topic)} added to {code(conf_path)}",
                         style="green",
                     )
                 else:
+                    print(f"Attempted topic: {code(topic)}", style="yellow")
                     typer.Abort()
     else:
         print(f"🎉 Topic: {code(topic)}", style="green")
