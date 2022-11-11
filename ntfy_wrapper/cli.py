@@ -3,7 +3,6 @@
 """
 from pathlib import Path
 from typing import Any, Optional
-from uuid import uuid4
 
 import typer
 from rich.console import Console
@@ -61,7 +60,7 @@ def init(conf_path: Optional[str] = None, force: bool = False):
     if conf_path.exists() and not force:
         print(f"Config file already exists at {code(conf_path)}")
         raise typer.Abort()
-    topic = str(uuid4())
+    topic = utils.generate_topic()
     base_conf = utils.load_conf()
     base_conf.pop("emails", None)
     base_conf.pop("topics", None)
@@ -72,7 +71,7 @@ def init(conf_path: Optional[str] = None, force: bool = False):
     )
     print(
         f"🔑 Your first topic is {code(topic)}."
-        + "\n   Use it to subscribe to notifications!",
+        + " Use it to subscribe to notifications!",
         style="yellow",
     )
     print(f"🎉 Config file created at {code(conf_path)}", style="green")
@@ -289,6 +288,29 @@ def send(
         "🎉 Notification sent to " + ", ".join([code(d) for d in dispatchs]),
         style="green",
     )
+
+
+@app.command()
+def new_topic(save: Optional[bool] = False):
+    """
+    Generates a random topic name and saves it to the config file if
+    you use the --save option.
+    """
+    topic = utils.generate_topic()
+    if save:
+        conf_path = utils.get_conf_path()
+        conf = utils.load_conf(conf_path)
+        topics = conf.pop("topics", [])
+        emails = conf.pop("emails", [])
+        if topic not in topics:
+            topics.append(topic)
+            utils.write_conf(conf_path, topics, emails, conf)
+            print(
+                f"🎉 Topic {code(topic)} added to {code(conf_path)}",
+                style="green",
+            )
+    else:
+        print(f"🎉 Topic: {code(topic)}", style="green")
 
 
 if __name__ == "__main__":

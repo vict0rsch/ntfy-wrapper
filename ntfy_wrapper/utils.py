@@ -1,9 +1,11 @@
 """
 A module containing utility functions for ntfy-wrapper.
 """
-from pathlib import Path
-from typing import Optional, Union, List, Dict
 import configparser
+from pathlib import Path
+from typing import Dict, List, Optional, Union
+
+from xkcdpass import xkcd_password as xp
 
 DOCSTRING = """
 This INI config file contains 2 sections:
@@ -129,3 +131,16 @@ def write_conf(
         config.set("message_defaults", k, v)
 
     config.write(conf_path.open("w"))
+
+
+def generate_topic():
+    """
+    Generate a cryptographically secure topic id using ``xkcdpass``.
+    See https://xkcd.com/936/ for illustration
+
+    Returns:
+        str: dash-separated topic id
+    """
+    wordfile = xp.locate_wordfile()
+    words = xp.generate_wordlist(wordfile=wordfile, min_length=3, max_length=6)
+    return "-".join(xp.generate_xkcdpassword(words, numwords=4).split())
