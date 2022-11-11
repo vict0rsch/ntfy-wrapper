@@ -6,7 +6,14 @@ from typing import Dict, List, Optional, Union
 
 import requests
 
-from ntfy_wrapper.utils import generate_topic, get_conf_path, load_conf, write_conf
+from ntfy_wrapper.utils import (
+    generate_topic,
+    get_conf_path,
+    load_conf,
+    write_conf,
+    code,
+    print,
+)
 
 
 class Notifier:
@@ -83,16 +90,19 @@ class Notifier:
         # that can be overwritten by the user in the conf or the init args
         conf = load_conf(self.conf_path)
         conf.update(defaults)
-        conf_topics = conf.pop("topics", [generate_topic()])
+        conf_topics = conf.pop("topics", None)
         conf_emails = conf.pop("emails", [])
 
         if self.topics is None:
-            if self.emails is None:
+            if self.emails is None and not conf_topics:
                 self._warn(
                     "No topic set, and no email set."
                     + " Creating a random topic for you."
                 )
-                self.topics = conf_topics
+            if not conf_topics:
+                conf_topics = [generate_topic()]
+            self.topics = conf_topics
+
         if self.emails is None:
             self.emails = conf_emails
 
@@ -117,17 +127,23 @@ class Notifier:
             message (str): The message to print.
         """
         if self.warnings:
-            print(message)
+            print(message, style="yellow")
 
     def describe(self):
         """
         Describe the notifier.
         """
         if self.topics:
-            print("📬 Notifier will push to topics: " + ", ".join(self.topics))
+            print(
+                f"📬 {code('Notifier')} will push to topics: "
+                + ", ".join([code(t) for t in self.topics])
+            )
         if self.emails:
-            print("📧 Notifier will send emails to: " + ", ".join(self.emails))
-        print("🛠 Its configuration is in: " + str(self.conf_path))
+            print(
+                "📧 Notifier will send emails to: "
+                + ", ".join([code(e) for e in self.emails])
+            )
+        print("🛠  Its configuration is in: " + code(self.conf_path))
 
     def remove_topics(
         self,
@@ -208,7 +224,9 @@ class Notifier:
         self._warn(
             "⚠️ Warning: your configuration may contain sensitive data. "
             + "Make sure it is ignored by your version control system "
-            + "(in .gitignore for instance)."
+            + f"(in {code('.gitignore')} for instance)."
+            + f" Use {code('warnings=False')} in {code('Notifier.__init__')}"
+            + " to disable this warning."
         )
         write_conf(self.conf_path, self.topics, self.emails, self.defaults)
 

@@ -1,17 +1,21 @@
 """
 ``py-ntfy`` command-line interface.
 """
-from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
 import typer
-from rich.console import Console
-from rich.theme import Theme
 
-from ntfy_wrapper import utils, Notifier
 
-custom_theme = Theme({"code": "grey70 bold italic"})
-print = Console(theme=custom_theme).print
+from ntfy_wrapper import Notifier
+from ntfy_wrapper.utils import (
+    generate_topic,
+    load_conf,
+    write_conf,
+    code,
+    print,
+    get_conf_path,
+)
+
 
 app = typer.Typer()
 add_app = typer.Typer()
@@ -30,24 +34,6 @@ app.add_typer(
 )
 
 
-def code(value: Any) -> str:
-    """
-    Turns an object into a string and wraps it in a ``rich`` ``code`` block.
-    A pathlib Path will be shortened to the 3 last parts of the path.
-
-    Args:
-        value (Any): Object to convert to string and wrap in
-            a ``rich`` ``code`` block.
-
-    Returns:
-        str: Code-wrapped value: ``[code]{str(value)}[/code]``
-    """
-    if isinstance(value, Path):
-        if len(value.parts) > 3:
-            value = Path(*value.parts[:2], "...", *value.parts[-3:])
-    return f"[code]{str(value)}[/code]"
-
-
 @app.command()
 def init(conf_path: Optional[str] = None, force: bool = False):
     """
@@ -56,15 +42,15 @@ def init(conf_path: Optional[str] = None, force: bool = False):
     Use --conf-path to specify a path to the configuration file.
     Use --force to overwrite an existing configuration file.
     """
-    conf_path = utils.get_conf_path(conf_path)
+    conf_path = get_conf_path(conf_path)
     if conf_path.exists() and not force:
         print(f"Config file already exists at {code(conf_path)}")
         raise typer.Abort()
-    topic = utils.generate_topic()
-    base_conf = utils.load_conf()
+    topic = generate_topic()
+    base_conf = load_conf()
     base_conf.pop("emails", None)
     base_conf.pop("topics", None)
-    utils.write_conf(
+    write_conf(
         conf_path,
         topics=[topic],
         defaults=base_conf,
@@ -84,7 +70,7 @@ def clean(conf_path: Optional[str] = None, force: bool = False):
     Use --conf-path to specify a path to the configuration file.
     Use --force to skip the confirmation prompt.
     """
-    conf_path = utils.get_conf_path(conf_path)
+    conf_path = get_conf_path(conf_path)
     if conf_path.exists():
         if not force:
             confirm = typer.confirm(
@@ -105,17 +91,17 @@ def add_topic(topic: str, conf_path: Optional[str] = None):
     Adds a topic to the config file.
     If --conf-path is not given, the current working directory will be used.
     """
-    conf_path = utils.get_conf_path(conf_path)
+    conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
         raise typer.Abort(f"Config file not found at {str(conf_path)}")
-    conf = utils.load_conf(conf_path)
+    conf = load_conf(conf_path)
     topics = conf.pop("topics", [])
     if topic not in topics:
         topics.append(topic)
     else:
         print(f"Topic {topic} already exists.")
         raise typer.Abort()
-    utils.write_conf(conf_path, topics, conf.pop("emails", None), conf)
+    write_conf(conf_path, topics, conf.pop("emails", None), conf)
     print(f"🎉 Topic {code(topic)} added to {code(conf_path)}", style="green")
 
 
@@ -125,17 +111,17 @@ def add_email(email: str, conf_path: Optional[str] = None):
     Adds an email to the config file.
     If --conf-path is not given, the current working directory will be used.
     """
-    conf_path = utils.get_conf_path(conf_path)
+    conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
         raise typer.Abort(f"Config file not found at {str(conf_path)}")
-    conf = utils.load_conf(conf_path)
+    conf = load_conf(conf_path)
     emails = conf.pop("emails", [])
     if email not in emails:
         emails.append(email)
     else:
         print(f"email {email} already exists.")
         raise typer.Abort()
-    utils.write_conf(conf_path, conf.pop("topics", None), emails, conf)
+    write_conf(conf_path, conf.pop("topics", None), emails, conf)
     print(f"🎉 Email {code(email)} added to {code(conf_path)}", style="green")
 
 
@@ -145,19 +131,17 @@ def add_default(key: str, value: str, conf_path: Optional[str] = None):
     Adds a default to the config file.
     If --conf-path is not given, the current working directory will be used.
     """
-    conf_path = utils.get_conf_path(conf_path)
+    conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
         raise typer.Abort(f"Config file not found at {str(conf_path)}")
-    conf = utils.load_conf(conf_path)
+    conf = load_conf(conf_path)
     if key in conf:
         print(
             f"Default {code(key)} already exists: {code(conf[key])}."
             + "\nOverwriting.",
         )
     conf[key] = value
-    utils.write_conf(
-        conf_path, conf.pop("topics", None), conf.pop("emails", None), conf
-    )
+    write_conf(conf_path, conf.pop("topics", None), conf.pop("emails", None), conf)
     print(
         f"🎉 Default {code(str(key)+'='+str(value))} added to {code(conf_path)}",
         style="green",
@@ -170,14 +154,14 @@ def remove_topic(topic: str, conf_path: Optional[str] = None):
     Removes a topic from the config file.
     If --conf-path is not given, the current working directory will be used.
     """
-    conf_path = utils.get_conf_path(conf_path)
+    conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
         raise typer.Abort(f"Config file not found at {str(conf_path)}")
-    conf = utils.load_conf(conf_path)
+    conf = load_conf(conf_path)
     topics = conf.pop("topics", [])
     if topic in topics:
         topics.remove(topic)
-        utils.write_conf(conf_path, topics, conf.pop("emails", None), conf)
+        write_conf(conf_path, topics, conf.pop("emails", None), conf)
         print(f"🎉 Topic {code(topic)} removed from {code(conf_path)}", style="green")
     else:
         print(f"Topic {code(topic)} does not exist. Ignoring.")
@@ -189,14 +173,14 @@ def remove_email(email: str, conf_path: Optional[str] = None):
     Removes an email from the config file.
     If --conf-path is not given, the current working directory will be used.
     """
-    conf_path = utils.get_conf_path(conf_path)
+    conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
         raise typer.Abort(f"Config file not found at {str(conf_path)}")
-    conf = utils.load_conf(conf_path)
+    conf = load_conf(conf_path)
     emails = conf.pop("emails", [])
     if email in emails:
         emails.remove(email)
-        utils.write_conf(conf_path, conf.pop("topics", None), emails, conf)
+        write_conf(conf_path, conf.pop("topics", None), emails, conf)
         print(f"🎉 Email {code(email)} removed from {code(conf_path)}", style="green")
     else:
         print(f"Email {code(email)} does not exist. Ignoring.", style="yellow")
@@ -208,15 +192,13 @@ def remove_default(key: str, conf_path: Optional[str] = None):
     Removes a default from the config file.
     If --conf-path is not given, the current working directory will be used.
     """
-    conf_path = utils.get_conf_path(conf_path)
+    conf_path = get_conf_path(conf_path)
     if not conf_path.exists():
         raise typer.Abort(f"Config file not found at {str(conf_path)}")
-    conf = utils.load_conf(conf_path)
+    conf = load_conf(conf_path)
     if key in conf:
         value = conf.pop(key)
-        utils.write_conf(
-            conf_path, conf.pop("topics", None), conf.pop("emails", None), conf
-        )
+        write_conf(conf_path, conf.pop("topics", None), conf.pop("emails", None), conf)
         print(
             f"🎉 Default {code(str(key)+'='+str(value))} removed from {code(conf_path)}",
             style="green",
@@ -296,15 +278,15 @@ def new_topic(save: Optional[bool] = False):
     Generates a random topic name and saves it to the config file if
     you use the --save option.
     """
-    topic = utils.generate_topic()
+    topic = generate_topic()
     if save:
-        conf_path = utils.get_conf_path()
-        conf = utils.load_conf(conf_path)
+        conf_path = get_conf_path()
+        conf = load_conf(conf_path)
         topics = conf.pop("topics", [])
         emails = conf.pop("emails", [])
         if topic not in topics:
             topics.append(topic)
-            utils.write_conf(conf_path, topics, emails, conf)
+            write_conf(conf_path, topics, emails, conf)
             print(
                 f"🎉 Topic {code(topic)} added to {code(conf_path)}",
                 style="green",

@@ -3,9 +3,15 @@ A module containing utility functions for ntfy-wrapper.
 """
 import configparser
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 
+from rich.console import Console
+from rich.theme import Theme
 from xkcdpass import xkcd_password as xp
+
+custom_theme = Theme({"code": "grey70 bold italic"})
+print = Console(theme=custom_theme).print
+
 
 DOCSTRING = """
 This INI config file contains 2 sections:
@@ -144,3 +150,21 @@ def generate_topic():
     wordfile = xp.locate_wordfile()
     words = xp.generate_wordlist(wordfile=wordfile, min_length=3, max_length=6)
     return "-".join(xp.generate_xkcdpassword(words, numwords=4).split())
+
+
+def code(value: Any) -> str:
+    """
+    Turns an object into a string and wraps it in a ``rich`` ``code`` block.
+    A pathlib Path will be shortened to the 3 last parts of the path.
+
+    Args:
+        value (Any): Object to convert to string and wrap in
+            a ``rich`` ``code`` block.
+
+    Returns:
+        str: Code-wrapped value: ``[code]{str(value)}[/code]``
+    """
+    if isinstance(value, Path):
+        if len(value.parts) > 3:
+            value = Path(*value.parts[:2], "...", *value.parts[-3:])
+    return f"[code]{str(value)}[/code]"
