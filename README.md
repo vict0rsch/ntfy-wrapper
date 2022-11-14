@@ -61,18 +61,18 @@ if __name__ == "__main__":
     # Note: anyone with your topic id can subscribe to your notification. It's probably
     # best to *exclude* the configuration file from version control.
 
-    ntfy.notify("Job has been allocated, starting Model training")
+    ntfy("Job has been allocated, starting Model training")
 
     try:
         results = do_some_stuff()
         if results["metric"] > threshold:
-            ntfy.notify(
+            ntfy(
                 f"Great model! Its metric is {results['metric']:.3f}",
                 tags="white_check_mark",  # this is the ✅ emoji
                 click=results["online_run_url"],
             )
         else:
-            ntfy.notify(f"Done, but not great ({results['metric']:.3f})", tags="disappointed")
+            ntfy(f"Done, but not great ({results['metric']:.3f})", tags="disappointed")
     except Exception as e:
         ntfy.notify(f"Error! -> {str(e)}", priority=4, emails="you@foo.bar")
 ```
