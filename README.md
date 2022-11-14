@@ -42,10 +42,18 @@ from ntfy_wrapper import Notifier
 if __name__ == "__main__":
 
     ntfy = Notifier(defaults={"title": "Your Project Name"})
-    # grab the topic id that was just printed here ⬆️ in order
-    # to subscribe to it on the web app or cli or mobile app
-    # (ntfy_wrapper will dump a config file so the same id will be
-    # re-used next time. Remember to *exclude* it from version control)
+    # IFF this is the first call to `ntfy_wrapper` in your project, this line ^
+    # will print a topic id.
+    # It will also write the topic id to `.ntfy.conf` so this only happens once!
+    #
+    # Use one of those methods (from the print or the conf file) to copy the topic id
+    # and use it to subscribe to notifications from the web or mobile apps.
+    #
+    # You can also use the command-line `$ py-ntfy init` before executing your code
+    # and the same process will happen (new topic + conf file)
+    #
+    # Note: anyone with your topic id can subscribe to your notification. It's probably
+    # best to *exclude* the configuration file from version control.
 
     ntfy.notify("Job has been allocated, starting Model training")
 
