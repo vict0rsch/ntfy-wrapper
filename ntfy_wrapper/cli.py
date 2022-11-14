@@ -319,7 +319,7 @@ def describe(conf_path: Optional[str] = None):
         "\n   • ".join(
             [""]
             + [
-                str(k) + "=" + str(v)
+                str(k) + " = " + str(v)
                 for k, v in conf.items()
                 if k not in ["topics", "emails"]
             ]
