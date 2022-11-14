@@ -286,13 +286,14 @@ class Notifier:
         message: str,
         topics: Optional[Union[str, List[str]]] = None,
         emails: Optional[List[str]] = None,
-        title: Optional[str] = "From ntfy_wrapper",
+        title: Optional[str] = None,
         priority: Optional[int] = None,
         tags: Optional[Union[str, List[str]]] = None,
         click: Optional[str] = None,
         attach: Optional[str] = None,
         actions: Optional[Union[str, List[str]]] = None,
         icon: Optional[str] = None,
+        debug: Optional[bool] = False,
     ) -> List[str]:
         """
         Send a notification to the given topics and emails.
