@@ -79,6 +79,8 @@ if __name__ == "__main__":
 
 Note `ntfy(message)` is equivalent to `ntfy.notify(message)`, the former is an alias of the latter.
 
+**If you do not receive notifications** after you've made sure you've subscribed to the exact topic used by your `Notifier`, it's probably because the request being sent out is malformed. Investigate using `debug=True` in the `notify()` call (*e.g.* : `ntfy(message, debug=True)`).
+
 ## User Guide
 
 The central concept is **"topics"**. It's basically an ID used to publish/subscribe to notifications. You should keep it secret and not easily guessable because ***anyone with the topic id can subscribe to your notifications***. In particular, you should add `.ntfy.conf` to `.gitignore`.
