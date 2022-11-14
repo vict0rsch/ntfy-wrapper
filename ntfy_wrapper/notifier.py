@@ -400,6 +400,11 @@ class Notifier:
             dispatchs.append(dest)
 
             if not use_PUT:
+                if debug:
+                    print(f"Sending {message} to {dest}:")
+                    print("    target url: ", url)
+                    print("    message: ", message.encode("utf-8"))
+                    print("    headers: ", h)
                 requests.post(
                     url,
                     data=message.encode("utf-8"),
@@ -412,4 +417,19 @@ class Notifier:
                     data=open(attach, "rb"),
                     headers=h,
                 )
+
+        if debug:
+            print(
+                "Debug mode: make sure the above messages,"
+                + " headers and targets are correct."
+            )
+            print(
+                "In particular, no `None` should appear in the headers, and all their"
+                + " keys should start with an uppercase letter."
+            )
+            print(
+                "Refer to the `ntfy` documentation for more details about the exact "
+                + "syntax for individual headers: https://ntfy.sh/docs/publish/"
+            )
+
         return dispatchs
