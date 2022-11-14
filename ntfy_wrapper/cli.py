@@ -49,6 +49,7 @@ def init(conf_path: Optional[str] = None, force: bool = False):
         raise typer.Abort()
     topic = generate_topic()
     base_conf = load_conf()
+    base_conf["topics"] = [topic]
     write_conf(conf_path, base_conf)
     print(
         f"🔑 Your first topic is {code(topic)}."
@@ -305,6 +306,29 @@ def new_topic(save: Optional[bool] = False):
                     typer.Abort()
     else:
         print(f"🎉 Topic: {code(topic)}", style="green")
+
+
+@app.command()
+def describe(conf_path: Optional[str] = None):
+    """Describes the ntfy-wrapper configuration: topics, targets and defaults."""
+    conf_path = get_conf_path(conf_path)
+    if not conf_path.exists():
+        raise typer.BadParameter(f"Config file not found at {str(conf_path)}")
+    conf = load_conf(conf_path)
+    defaults = code(
+        "\n   • ".join(
+            [""]
+            + [
+                str(k) + " = " + str(v)
+                for k, v in conf.items()
+                if k not in ["topics", "emails"]
+            ]
+        )
+    )
+    print(f"🎉 Configuration file: {code(conf_path)}", style="green")
+    print(f"   Topics: {code(', '.join(conf.get('topics', [])))}", style="green")
+    print(f"   Emails: {code(', '.join(conf.get('emails', [])))}", style="green")
+    print(f"   Defaults:{defaults}", style="green")
 
 
 if __name__ == "__main__":

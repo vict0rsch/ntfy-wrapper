@@ -5,7 +5,7 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://pypi.org/project/ntfy-wrapper/"><img src="https://img.shields.io/badge/pypi%20package-0.1.3-yellowgreen" alt="PyPI version" height="18"></a>
+    <a href="https://pypi.org/project/ntfy-wrapper/"><img src="https://img.shields.io/badge/pypi%20package-0.1.4-yellowgreen" alt="PyPI version" height="18"></a>
     <a href="https://ntfy-wrapper.readthedocs.io/en/latest/index.html"><img src="https://img.shields.io/badge/docs-read%20the%20docs-blue" alt="PyPI version" height="18"></a>
     <a href="https://github.com/vict0rsch/ntfy-wrapper/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc"><img src="https://img.shields.io/github/issues-raw/vict0rsch/ntfy-wrapper" alt="Open Issues" height="18"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/codestyle-black-red" alt="Black code style" height="18"></a>
@@ -48,10 +48,18 @@ from ntfy_wrapper import Notifier
 if __name__ == "__main__":
 
     ntfy = Notifier(defaults={"title": "Your Project Name"})
-    # grab the topic id that was just printed here ⬆️ in order
-    # to subscribe to it on the web app or cli or mobile app
-    # (ntfy_wrapper will dump a config file so the same id will be
-    # re-used next time. Remember to *exclude* it from version control)
+    # IFF this is the first call to `ntfy_wrapper` in your project, this line ^
+    # will print a topic id.
+    # It will also write the topic id to `.ntfy.conf` so this only happens once!
+    #
+    # Use one of those methods (from the print or the conf file) to copy the topic id
+    # and use it to subscribe to notifications from the web or mobile apps.
+    #
+    # You can also use the command-line `$ py-ntfy init` before executing your code
+    # and the same process will happen (new topic + conf file)
+    #
+    # Note: anyone with your topic id can subscribe to your notification. It's probably
+    # best to *exclude* the configuration file from version control.
 
     ntfy.notify("Job has been allocated, starting Model training")
 
