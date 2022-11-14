@@ -47,7 +47,7 @@ from ntfy_wrapper import Notifier
 
 if __name__ == "__main__":
 
-    ntfy = Notifier(defaults={"title": "Your Project Name"})
+    ntfy = Notifier(notify_defaults={"title": "Your Project Name"})
     # IFF this is the first call to `ntfy_wrapper` in your project, this line ^
     # will print a topic id.
     # It will also write the topic id to `.ntfy.conf` so this only happens once!
