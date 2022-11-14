@@ -5,7 +5,7 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://pypi.org/project/ntfy-wrapper/"><img src="https://img.shields.io/badge/pypi%20package-0.1.4-yellowgreen" alt="PyPI version" height="18"></a>
+    <a href="https://pypi.org/project/ntfy-wrapper/"><img src="https://img.shields.io/badge/pypi%20package-0.1.5-yellowgreen" alt="PyPI version" height="18"></a>
     <a href="https://ntfy-wrapper.readthedocs.io/en/latest/index.html"><img src="https://img.shields.io/badge/docs-read%20the%20docs-blue" alt="PyPI version" height="18"></a>
     <a href="https://github.com/vict0rsch/ntfy-wrapper/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc"><img src="https://img.shields.io/github/issues-raw/vict0rsch/ntfy-wrapper" alt="Open Issues" height="18"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/codestyle-black-red" alt="Black code style" height="18"></a>
@@ -61,21 +61,25 @@ if __name__ == "__main__":
     # Note: anyone with your topic id can subscribe to your notification. It's probably
     # best to *exclude* the configuration file from version control.
 
-    ntfy.notify("Job has been allocated, starting Model training")
+    ntfy("Job has been allocated, starting Model training")
 
     try:
         results = do_some_stuff()
         if results["metric"] > threshold:
-            ntfy.notify(
+            ntfy(
                 f"Great model! Its metric is {results['metric']:.3f}",
                 tags="white_check_mark",  # this is the ✅ emoji
                 click=results["online_run_url"],
             )
         else:
-            ntfy.notify(f"Done, but not great ({results['metric']:.3f})", tags="disappointed")
+            ntfy(f"Done, but not great ({results['metric']:.3f})", tags="disappointed")
     except Exception as e:
         ntfy.notify(f"Error! -> {str(e)}", priority=4, emails="you@foo.bar")
 ```
+
+Note `ntfy(message)` is equivalent to `ntfy.notify(message)`, the former is an alias of the latter.
+
+**If you do not receive notifications** after you've made sure you've subscribed to the exact topic used by your `Notifier`, it's probably because the request being sent out is malformed. Investigate using `debug=True` in the `notify()` call (*e.g.* : `ntfy(message, debug=True)`).
 
 ## User Guide
 

@@ -62,15 +62,16 @@ class Notifier:
                 strings describing the emails to send notifications to by default.
                 Be aware of the rate limits: https://ntfy.sh/docs/publish/#limitations
                 Defaults to None.
-            notify_defaults (Optional[Dict], optional): Dict whose keys and values will be
-                default keyword arguments for the ``Notifier.notify()`` method so that
-                you don't have to write the same stuff again and again throughout
+            notify_defaults (Optional[Dict], optional): Dict whose keys and values will
+                be default keyword arguments for the ``Notifier.notify()`` method so
+                that you don't have to write the same stuff again and again throughout
                 your code. Defaults to {}.
             conf_path (Optional[Union[str, Path]], optional): String or pathlib.Path
                 pointing to where the Notifier should get or create its INI
                 configuration file. Defaults to None, meaning ``$CWD/.ntfy.conf``.
-            write (Optional[bool], optional): Whether to write the Notifier's state
-                to the configuration file after initialization. Defaults to True.
+            write (Optional[bool], optional): Whether to write the Notifier's config
+                if a new topic has to be created because none pre-exist.
+                Defaults to True.
             warnings (Optional[bool], optional): Whether or not to print warnings,
                 in particular the version control warning if ``write`` is True (by
                 default). Defaults to True.
@@ -109,10 +110,9 @@ class Notifier:
                     + " Creating a random topic for you."
                 )
                 self.conf["topics"] = [generate_topic()]
-
-        if write:
-            # save the config file
-            self.write_to_conf()
+                if write:
+                    # save the config file
+                    self.write_to_conf()
 
         assert self.conf.get("topics") or self.conf.get("emails"), (
             "You must specify at least one topic or email.\n" + self.describe()
@@ -120,6 +120,12 @@ class Notifier:
 
         if verbose:
             self.describe()
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        """
+        Alias for ``Notifier.notify()``.
+        """
+        return self.notify(*args, **kwds)
 
     def _warn(self, message: str) -> None:
         """
@@ -280,13 +286,14 @@ class Notifier:
         message: str,
         topics: Optional[Union[str, List[str]]] = None,
         emails: Optional[List[str]] = None,
-        title: Optional[str] = "From ntfy_wrapper",
+        title: Optional[str] = None,
         priority: Optional[int] = None,
         tags: Optional[Union[str, List[str]]] = None,
         click: Optional[str] = None,
         attach: Optional[str] = None,
         actions: Optional[Union[str, List[str]]] = None,
         icon: Optional[str] = None,
+        debug: Optional[bool] = False,
     ) -> List[str]:
         """
         Send a notification to the given topics and emails.
@@ -334,11 +341,16 @@ class Notifier:
             ValueError: The user cannot specify both ``attach`` and ``message``
 
         Returns:
-            List[str]: A list of the urls the notifications have been dispatched to:
+            List[str]: A list of the targets notifications have been dispatched to:
                 one for each topic and one for each email.
         """
-        defaults = {k: v for k, v in self.conf.items() if k not in {"topics", "emails"}}
+        defaults = {
+            k.capitalize(): v
+            for k, v in self.conf.items()
+            if k not in {"topics", "emails"}
+        }
         headers = {**defaults, "priority": priority}
+        headers = {k: v for k, v in headers.items() if v is not None}
 
         if attach and message:
             raise ValueError("You cannot specify both `attach` and `message`")
@@ -400,6 +412,11 @@ class Notifier:
             dispatchs.append(dest)
 
             if not use_PUT:
+                if debug:
+                    print(f"Sending {message} to {dest}:")
+                    print("    target url: ", url)
+                    print("    message: ", message.encode("utf-8"))
+                    print("    headers: ", h)
                 requests.post(
                     url,
                     data=message.encode("utf-8"),
@@ -412,4 +429,19 @@ class Notifier:
                     data=open(attach, "rb"),
                     headers=h,
                 )
+
+        if debug:
+            print(
+                "Debug mode: make sure the above messages,"
+                + " headers and targets are correct."
+            )
+            print(
+                "In particular, no `None` should appear in the headers, and all their"
+                + " keys should start with an uppercase letter."
+            )
+            print(
+                "Refer to the `ntfy` documentation for more details about the exact "
+                + "syntax for individual headers: https://ntfy.sh/docs/publish/"
+            )
+
         return dispatchs
