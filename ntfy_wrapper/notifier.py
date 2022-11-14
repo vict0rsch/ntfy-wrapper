@@ -121,6 +121,12 @@ class Notifier:
         if verbose:
             self.describe()
 
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        """
+        Alias for ``Notifier.notify()``.
+        """
+        return self.notify(*args, **kwds)
+
     def _warn(self, message: str) -> None:
         """
         Print a warning message if warnings are enabled.
