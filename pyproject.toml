@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ntfy-wrapper"
-version = "0.1.3"
+version = "0.1.4"
 description = "Fast & Free notifications for your code: Python wrapper around the ntfy.sh notifications service."
 authors = ["vict0rsch <vsch@pm.me>"]
 license = "MIT"
