@@ -77,6 +77,8 @@ if __name__ == "__main__":
         ntfy.notify(f"Error! -> {str(e)}", priority=4, emails="you@foo.bar")
 ```
 
+Note `ntfy(message)` is equivalent to `ntfy.notify(message)`, the former is an alias of the latter.
+
 ## User Guide
 
 The central concept is **"topics"**. It's basically an ID used to publish/subscribe to notifications. You should keep it secret and not easily guessable because ***anyone with the topic id can subscribe to your notifications***. In particular, you should add `.ntfy.conf` to `.gitignore`.
