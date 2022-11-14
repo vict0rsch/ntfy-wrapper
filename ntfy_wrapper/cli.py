@@ -49,6 +49,7 @@ def init(conf_path: Optional[str] = None, force: bool = False):
         raise typer.Abort()
     topic = generate_topic()
     base_conf = load_conf()
+    base_conf["topics"] = [topic]
     write_conf(conf_path, base_conf)
     print(
         f"🔑 Your first topic is {code(topic)}."
