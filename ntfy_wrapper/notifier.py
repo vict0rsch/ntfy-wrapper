@@ -62,15 +62,16 @@ class Notifier:
                 strings describing the emails to send notifications to by default.
                 Be aware of the rate limits: https://ntfy.sh/docs/publish/#limitations
                 Defaults to None.
-            notify_defaults (Optional[Dict], optional): Dict whose keys and values will be
-                default keyword arguments for the ``Notifier.notify()`` method so that
-                you don't have to write the same stuff again and again throughout
+            notify_defaults (Optional[Dict], optional): Dict whose keys and values will
+                be default keyword arguments for the ``Notifier.notify()`` method so
+                that you don't have to write the same stuff again and again throughout
                 your code. Defaults to {}.
             conf_path (Optional[Union[str, Path]], optional): String or pathlib.Path
                 pointing to where the Notifier should get or create its INI
                 configuration file. Defaults to None, meaning ``$CWD/.ntfy.conf``.
-            write (Optional[bool], optional): Whether to write the Notifier's state
-                to the configuration file after initialization. Defaults to True.
+            write (Optional[bool], optional): Whether to write the Notifier's config
+                if a new topic has to be created because none pre-exist.
+                Defaults to True.
             warnings (Optional[bool], optional): Whether or not to print warnings,
                 in particular the version control warning if ``write`` is True (by
                 default). Defaults to True.
@@ -109,10 +110,9 @@ class Notifier:
                     + " Creating a random topic for you."
                 )
                 self.conf["topics"] = [generate_topic()]
-
-        if write:
-            # save the config file
-            self.write_to_conf()
+                if write:
+                    # save the config file
+                    self.write_to_conf()
 
         assert self.conf.get("topics") or self.conf.get("emails"), (
             "You must specify at least one topic or email.\n" + self.describe()
