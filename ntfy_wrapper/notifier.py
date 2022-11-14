@@ -334,11 +334,16 @@ class Notifier:
             ValueError: The user cannot specify both ``attach`` and ``message``
 
         Returns:
-            List[str]: A list of the urls the notifications have been dispatched to:
+            List[str]: A list of the targets notifications have been dispatched to:
                 one for each topic and one for each email.
         """
-        defaults = {k: v for k, v in self.conf.items() if k not in {"topics", "emails"}}
+        defaults = {
+            k.capitalize(): v
+            for k, v in self.conf.items()
+            if k not in {"topics", "emails"}
+        }
         headers = {**defaults, "priority": priority}
+        headers = {k: v for k, v in headers.items() if v is not None}
 
         if attach and message:
             raise ValueError("You cannot specify both `attach` and `message`")
