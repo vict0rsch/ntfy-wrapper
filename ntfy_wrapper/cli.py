@@ -256,7 +256,7 @@ def send(
     dispatchs = Notifier(
         topics=topics,
         emails=emails,
-        defaults={},
+        notify_defaults={},
         conf_path=conf_path,
         write=False,
         warnings=False,
