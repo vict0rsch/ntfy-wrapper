@@ -293,8 +293,8 @@ class Notifier:
         attach: Optional[str] = None,
         actions: Optional[Union[str, List[str]]] = None,
         icon: Optional[str] = None,
-        debug: Optional[bool] = False,
         base_url: Optional[str] = None,
+        debug: Optional[bool] = False,
     ) -> List[str]:
         """
         Send a notification to the given topics and emails.
@@ -342,6 +342,8 @@ class Notifier:
             base_url (Optional[str], optional): The base URL to use for the API. Can be
                 a coma-separated list of URLs. Defaults to ``None``, i.e.
                 ``https://ntfy.sh`` if ``base_url`` is neither an arg nor in the congig.
+            debug (Optional[bool], optional): Whether to print debug information or not.
+                Defaults to ``False``.
 
         Raises:
             ValueError: The user cannot specify both ``attach`` and ``message``
