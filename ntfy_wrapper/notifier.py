@@ -56,28 +56,28 @@ class Notifier:
                 it's probably best you do not track any piece of code containing
                 your topics. That includes the configuration file this class creates
                 automatically (except if ``write`` is False).
-                Defaults to None, meaning a random (uuid) topic will be generated
+                Defaults to ``None``, meaning a random (uuid) topic will be generated
                 for you, and re-used next time, provided you have enabled ``write``.
             emails (Optional[Union[str, List[str]]], optional): String, or list of
                 strings describing the emails to send notifications to by default.
                 Be aware of the rate limits: https://ntfy.sh/docs/publish/#limitations
-                Defaults to None.
+                Defaults to ``None``.
             notify_defaults (Optional[Dict], optional): Dict whose keys and values will
                 be default keyword arguments for the ``Notifier.notify()`` method so
                 that you don't have to write the same stuff again and again throughout
-                your code. Defaults to {}.
-            conf_path (Optional[Union[str, Path]], optional): String or pathlib.Path
+                your code. Defaults to ``{}``.
+            conf_path (Optional[Union[str, Path]], optional): String or ``pathlib.Path``
                 pointing to where the Notifier should get or create its INI
-                configuration file. Defaults to None, meaning ``$CWD/.ntfy.conf``.
+                configuration file. Defaults to ``None``, meaning ``$CWD/.ntfy.conf``.
             write (Optional[bool], optional): Whether to write the Notifier's config
                 if a new topic has to be created because none pre-exist.
-                Defaults to True.
+                Defaults to ``True``.
             warnings (Optional[bool], optional): Whether or not to print warnings,
                 in particular the version control warning if ``write`` is True (by
-                default). Defaults to True.
+                default). Defaults to ``True``.
             verbose (Optional[bool], optional): Whether to describe the Notifier after
                 its initialization from your args and the (potentially non-existing)
-                conf. Defaults to True.
+                conf. Defaults to ``True``.
         """
 
         if isinstance(topics, str):
@@ -173,7 +173,7 @@ class Notifier:
         Args:
             topics (List[str]): The topics to remove.
             write (Optional[bool], optional): Whether to update the config file or not.
-                Defaults to True.
+                Defaults to ``True``.
         """
         for t in topics:
             if t not in self.conf.get("topics", []):
@@ -196,7 +196,7 @@ class Notifier:
         Args:
             emails (List[str]): The emails to remove.
             write (Optional[bool], optional): Whether to update the config file or not.
-                Defaults to True.
+                Defaults to ``True``.
         """
         for e in emails:
             if e not in self.conf.get("emails", []):
@@ -213,7 +213,7 @@ class Notifier:
 
         Args:
             write (Optional[bool], optional): Whether to update the config file or not.
-                Defaults to True.
+                Defaults to ``True``.
         """
         self.conf["topics"] = []
         if write:
@@ -226,7 +226,7 @@ class Notifier:
 
         Args:
             write (Optional[bool], optional): Whether to update the config file or not.
-                Defaults to True.
+                Defaults to ``True``.
         """
         self.conf["emails"] = []
         if write:
@@ -321,26 +321,26 @@ class Notifier:
         Args:
             message (str): The message to send.
             topics (Optional[Union[str, List[str]]], optional): Target topics to notify.
-                Defaults to None.
+                Defaults to ``None``.
             title (Optional[str], optional): The notifications' title.
                 Defaults to "From ntfy_wrapper".
             priority (Optional[int], optional): The notifications' priority.
-                Defaults to None.
+                Defaults to ``None``.
             tags (Optional[Union[str, List[str]]], optional): The notifications' tags.
-                Defaults to None.
+                Defaults to ``None``.
             click (Optional[str], optional):  URL to open when a notification is
-                clicked. Defaults to None.
+                clicked. Defaults to ``None``.
             attach (Optional[str], optional): Attachment to send: either a local image
-                file or an URL pointing to one. Defaults to None.
+                file or an URL pointing to one. Defaults to ``None``.
             actions (Optional[Union[str, List[str]]], optional): A string or list of
                 strings describing actions as per:
                 https://ntfy.sh/docs/publish/#using-a-header
-                Defaults to None.
-            emails (Optional[List[str]], optional): _description_. Defaults to None.
+                Defaults to ``None``.
+            emails (Optional[List[str]], optional): _description_. Defaults to ``None``.
             icon (Optional[str], optional): The notifications' icon as a URL to a
-                remote file. Defaults to None.
+                remote file. Defaults to ``None``.
             base_url (Optional[str], optional): The base URL to use for the API.
-                Defaults to None, i.e. ``https://ntfy.sh`` if ``base_url`` is neither
+                Defaults to ``None``, i.e. ``https://ntfy.sh`` if ``base_url`` is neither
                 an arg nor in the congig.
 
         Raises:

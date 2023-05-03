@@ -69,7 +69,7 @@ def get_conf_path(conf_path: Optional[Union[str, Path]] = None) -> Path:
 
     Args:
         conf_path (Optional[Union[str, Path]], optional): Where to look for the config
-            file. Defaults to None.
+            file. Defaults to ``None``.
 
     Returns:
         Path: _description_
@@ -94,7 +94,7 @@ def load_conf(conf_path: Optional[Union[str, Path]] = None) -> dict:
 
     Args:
         conf_path (Optional[Union[str, Path]], optional): Where to load the conf
-        from. Defaults to None.
+        from. Defaults to ``None``.
 
     Returns:
         dict: The configuration as a dictionary.
