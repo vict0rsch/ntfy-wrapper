@@ -64,11 +64,11 @@ class Notifier:
                 strings describing the emails to send notifications to by default.
                 Be aware of the rate limits: https://ntfy.sh/docs/publish/#limitations
                 Defaults to ``None``.
-            base_url (Optional[str], optional): The base url to use to send
-                notifications. It defaults to ``None``, *i.e.* ``https://ntfy.sh``
-                but you can set it to a self-hosted ``ntfy`` instance for example.
-                ``base_url`` can be a list of comma-separated urls, in which case
-                they will all be notified.
+            base_url (Optional[str], optional): String or list of strings describing
+                the base url to use and send notifications to. It defaults to ``None``,
+                *i.e.* ``https://ntfy.sh`` but you can set it to a self-hosted ``ntfy``
+                instance for example. ``base_url`` can be a list of comma-separated
+                urls, in which case they will all be notified.
             notify_defaults (Optional[Dict], optional): Dict whose keys and values will
                 be default keyword arguments for the ``Notifier.notify()`` method so
                 that you don't have to write the same stuff again and again throughout
