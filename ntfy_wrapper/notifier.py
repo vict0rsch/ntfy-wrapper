@@ -15,6 +15,7 @@ from ntfy_wrapper.utils import (
     print,
     KEYS,
 )
+import json
 
 
 class Notifier:
@@ -27,7 +28,7 @@ class Notifier:
         self,
         topics: Optional[Union[str, List[str]]] = None,
         emails: Optional[Union[str, List[str]]] = None,
-        base_url: Optional[str] = None,
+        base_url: Optional[Union[str, List[str]]] = None,
         notify_defaults: Optional[Dict] = {},
         conf_path: Optional[Union[str, Path]] = None,
         write: Optional[bool] = True,
@@ -293,7 +294,8 @@ class Notifier:
         self,
         message: str,
         topics: Optional[Union[str, List[str]]] = None,
-        emails: Optional[List[str]] = None,
+        emails: Optional[Union[str, List[str]]] = None,
+        base_url: Optional[Union[str, List[str]]] = None,
         title: Optional[str] = None,
         priority: Optional[int] = None,
         tags: Optional[Union[str, List[str]]] = None,
@@ -330,6 +332,12 @@ class Notifier:
             message (str): The message to send.
             topics (Optional[Union[str, List[str]]], optional): Target topics to notify.
                 Defaults to ``None``.
+            emails (Optional[Union[str, List[str]]], optional): Target emails to send
+                notifications to. Defaults to ``None``.
+            base_url (Optional[Union[str, List[str]]], optional): The base URL to use
+                for the API. Can be a coma-separated list of URLs. Defaults to ``None``,
+                i.e. ``https://ntfy.sh`` if ``base_url`` is neither an arg nor in the
+                config.
             title (Optional[str], optional): The notifications' title.
                 Defaults to "From ntfy_wrapper".
             priority (Optional[int], optional): The notifications' priority.
@@ -363,7 +371,7 @@ class Notifier:
         defaults = {
             k.capitalize(): v
             for k, v in self.conf.items()
-            if k not in {"topics", "emails"}
+            if k not in {"topics", "emails", "base_url"}
         }
         headers = {**defaults, "priority": priority}
         headers = {k: v for k, v in headers.items() if v is not None}
@@ -374,11 +382,12 @@ class Notifier:
         use_PUT = False
 
         if base_url is None:
-            base_url = self.conf.get("base_url", "https://ntfy.sh")
-        if "," in base_url:
-            base_urls = [u.strip() for u in base_url.split(",")]
-        else:
-            base_urls = [base_url]
+            base_url = self.conf.get("base_url", ["https://ntfy.sh"])
+        if isinstance(base_url, str):
+            if "," in base_url:
+                base_urls = [u.strip() for u in base_url.split(",")]
+            else:
+                base_urls = [base_url]
 
         base_urls = [u[:-1] if u.endswith("/") else u for u in base_urls]
 

@@ -113,6 +113,11 @@ def load_conf(conf_path: Optional[Union[str, Path]] = None) -> dict:
                 conf["emails"] = [
                     e.strip() for e in config.get("notifier_init", "emails").split(",")
                 ]
+            if "base_url" in config["notifier_init"]:
+                conf["base_url"] = [
+                    e.strip()
+                    for e in config.get("notifier_init", "base_url").split(",")
+                ]
         if config.has_section("notify_defaults"):
             conf.update(dict(config["notify_defaults"]))
         return conf
@@ -153,7 +158,7 @@ def write_conf(
     if emails:
         config.set("notifier_init", "emails", ",".join(emails))
     if base_url:
-        config.set("notifier_init", "base_url", base_url)
+        config.set("notifier_init", "base_url", ",".join(base_url))
 
     config.add_section("notify_defaults")
     for k, v in conf.items():
