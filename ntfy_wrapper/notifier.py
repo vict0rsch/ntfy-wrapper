@@ -339,9 +339,9 @@ class Notifier:
             emails (Optional[List[str]], optional): _description_. Defaults to ``None``.
             icon (Optional[str], optional): The notifications' icon as a URL to a
                 remote file. Defaults to ``None``.
-            base_url (Optional[str], optional): The base URL to use for the API.
-                Defaults to ``None``, i.e. ``https://ntfy.sh`` if ``base_url`` is neither
-                an arg nor in the congig.
+            base_url (Optional[str], optional): The base URL to use for the API. Can be
+                a coma-separated list of URLs. Defaults to ``None``, i.e.
+                ``https://ntfy.sh`` if ``base_url`` is neither an arg nor in the congig.
 
         Raises:
             ValueError: The user cannot specify both ``attach`` and ``message``
@@ -365,8 +365,12 @@ class Notifier:
 
         if base_url is None:
             base_url = self.conf.get("base_url", "https://ntfy.sh")
-        if base_url.endswith("/"):
-            base_url = base_url[:-1]
+        if "," in base_url:
+            base_urls = [u.strip() for u in base_url.split(",")]
+        else:
+            base_urls = [base_url]
+
+        base_urls = [u[:-1] if u.endswith("/") else u for u in base_urls]
 
         if title is not None:
             headers["Title"] = title
@@ -408,38 +412,38 @@ class Notifier:
         assert isinstance(topics, list)
 
         dispatchs = []
+        for base_url in base_urls:
+            for dtype, dest in [("topic", t) for t in topics] + [
+                ("email", e) for e in emails
+            ]:
+                h = headers.copy()
 
-        for dtype, dest in [("topic", t) for t in topics] + [
-            ("email", e) for e in emails
-        ]:
-            h = headers.copy()
+                if dtype == "email":
+                    h["Email"] = dest
+                    url = f"{base_url}/alerts"
+                else:
+                    url = f"{base_url}/{dest}"
 
-            if dtype == "email":
-                h["Email"] = dest
-                url = f"{base_url}/alerts"
-            else:
-                url = f"{base_url}/{dest}"
+                dispatchs.append(dest)
 
-            dispatchs.append(dest)
-
-            if not use_PUT:
-                if debug:
-                    print(f"Sending {message} to {dest}:")
-                    print("    target url: ", url)
-                    print("    message: ", message.encode("utf-8"))
-                    print("    headers: ", h)
-                requests.post(
-                    url,
-                    data=message.encode("utf-8"),
-                    headers=h,
-                )
-            else:
-                h["Filename"] = Path(attach).name
-                requests.put(
-                    url,
-                    data=open(attach, "rb"),
-                    headers=h,
-                )
+                if not use_PUT:
+                    if debug:
+                        print(f"Sending {message} to {dest}:")
+                        print("    target url: ", url)
+                        print("    message: ", message.encode("utf-8"))
+                        print("    headers: ", h)
+                    requests.post(
+                        url,
+                        data=message.encode("utf-8"),
+                        headers=h,
+                    )
+                else:
+                    h["Filename"] = Path(attach).name
+                    requests.put(
+                        url,
+                        data=open(attach, "rb"),
+                        headers=h,
+                    )
 
         if debug:
             print(
