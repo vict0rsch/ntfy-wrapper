@@ -294,6 +294,7 @@ class Notifier:
         actions: Optional[Union[str, List[str]]] = None,
         icon: Optional[str] = None,
         debug: Optional[bool] = False,
+        base_url: Optional[str] = None,
     ) -> List[str]:
         """
         Send a notification to the given topics and emails.
@@ -304,6 +305,8 @@ class Notifier:
 
         The ``defaults`` you may have used in the ``init()`` method are used here.
         You can override them by passing the corresponding arguments.
+
+        In other words: ``arg`` > ``self.conf`` > ``defaults``.
 
         If ``topics`` is None, the topics are taken from the configuration file.
         If ``emails`` is not None, the notification is sent by email to the given
@@ -336,6 +339,9 @@ class Notifier:
             emails (Optional[List[str]], optional): _description_. Defaults to None.
             icon (Optional[str], optional): The notifications' icon as a URL to a
                 remote file. Defaults to None.
+            base_url (Optional[str], optional): The base URL to use for the API.
+                Defaults to None, i.e. ``https://ntfy.sh`` if ``base_url`` is neither
+                an arg nor in the congig.
 
         Raises:
             ValueError: The user cannot specify both ``attach`` and ``message``
@@ -356,6 +362,11 @@ class Notifier:
             raise ValueError("You cannot specify both `attach` and `message`")
 
         use_PUT = False
+
+        if base_url is None:
+            base_url = self.conf.get("base_url", "https://ntfy.sh")
+        if base_url.endswith("/"):
+            base_url = base_url[:-1]
 
         if title is not None:
             headers["Title"] = title
@@ -405,9 +416,9 @@ class Notifier:
 
             if dtype == "email":
                 h["Email"] = dest
-                url = "https://ntfy.sh/alerts"
+                url = f"{base_url}/alerts"
             else:
-                url = f"https://ntfy.sh/{dest}"
+                url = f"{base_url}/{dest}"
 
             dispatchs.append(dest)
 
