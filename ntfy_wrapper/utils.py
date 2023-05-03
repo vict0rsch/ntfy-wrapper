@@ -46,6 +46,7 @@ Example:
 [notifier_init]
 topics = my-secret-topic-1, mysecrettopic2
 emails = you@foo.bar
+base_url = https://ntfy.your-server.io
 
 # For Notifier.notify(title=..., priority=..., etc.)
 [notify_defaults]
