@@ -139,6 +139,7 @@ def write_conf(
     conf = deepcopy(conf)
     topics = conf.pop("topics", None)
     emails = conf.pop("emails", None)
+    base_url = conf.pop("base_url", None)
 
     config = configparser.ConfigParser(allow_no_value=True)
 
@@ -151,6 +152,8 @@ def write_conf(
         config.set("notifier_init", "topics", ",".join(topics))
     if emails:
         config.set("notifier_init", "emails", ",".join(emails))
+    if base_url:
+        config.set("notifier_init", "base_url", base_url)
 
     config.add_section("notify_defaults")
     for k, v in conf.items():
