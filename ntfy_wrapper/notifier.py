@@ -419,6 +419,16 @@ class Notifier:
                 base_urls = [u.strip() for u in base_url.split(",")]
             else:
                 base_urls = [base_url]
+        if not isinstance(base_urls, list) or not base_urls or not base_urls[0]:
+            self._warn(
+                "\nNo base URL specified in conf or as argument,"
+                + " using https://ntfy.sh\n"
+            )
+            base_urls = ["https://ntfy.sh"]
+
+        for u in base_urls:
+            if not u.startswith("http"):
+                self._warn(f"\nBe careful, base url does not start with `http` : {u}\n")
 
         base_urls = [u[:-1] if u.endswith("/") else u for u in base_urls]
 
