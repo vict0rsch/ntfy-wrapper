@@ -438,10 +438,13 @@ class Notifier:
 
                 if not use_PUT:
                     if debug:
-                        print(f"Sending {message} to {dest}:")
+                        print(f"➡️ Sending `{message}` to `{dest}`:")
                         print("    target url: ", url)
                         print("    message: ", message.encode("utf-8"))
-                        print("    headers: ", h)
+                        print(
+                            "    headers: ",
+                            "\n    ".join(json.dumps(h, indent=2).splitlines()),
+                        )
                     requests.post(
                         url,
                         data=message.encode("utf-8"),
@@ -457,7 +460,7 @@ class Notifier:
 
         if debug:
             print(
-                "Debug mode: make sure the above messages,"
+                "\nDebug mode: make sure the above messages,"
                 + " headers and targets are correct."
             )
             print(
