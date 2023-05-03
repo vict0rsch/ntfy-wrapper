@@ -215,6 +215,29 @@ class Notifier:
         if write:
             self.write_to_conf()
 
+    def remove_base_urls(
+        self,
+        base_urls: List[str],
+        write: Optional[bool] = True,
+    ):
+        """
+        Remove urls from the Notifier's targets.
+        If ``write`` is True, the configuration file is updated.
+        If an url does not exist, it is ignored.
+
+        Args:
+            base_urls (List[str]): The base_urls to remove.
+            write (Optional[bool], optional): Whether to update the config file or not.
+                Defaults to ``True``.
+        """
+        for e in base_urls:
+            if e not in self.conf.get("base_url", []):
+                self._warn(f"URL {e} is not in the list of base_url")
+            else:
+                self.conf["base_url"].remove(e)
+        if write:
+            self.write_to_conf()
+
     def remove_all_topics(self, write: Optional[bool] = True):
         """
         Remove all emails from the Notifier's targets.
@@ -238,6 +261,19 @@ class Notifier:
                 Defaults to ``True``.
         """
         self.conf["emails"] = []
+        if write:
+            self.write_to_conf()
+
+    def remove_all_base_urls(self, write: Optional[bool] = True):
+        """
+        Remove all base urls from the Notifier's targets.
+        If ``write`` is True, the configuration file is updated.
+
+        Args:
+            write (Optional[bool], optional): Whether to update the config file or not.
+                Defaults to ``True``.
+        """
+        self.conf["base_url"] = []
         if write:
             self.write_to_conf()
 
