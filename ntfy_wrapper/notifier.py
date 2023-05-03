@@ -339,7 +339,6 @@ class Notifier:
         attach: Optional[str] = None,
         actions: Optional[Union[str, List[str]]] = None,
         icon: Optional[str] = None,
-        base_url: Optional[str] = None,
         debug: Optional[bool] = False,
     ) -> List[str]:
         """
@@ -388,12 +387,8 @@ class Notifier:
                 strings describing actions as per:
                 https://ntfy.sh/docs/publish/#using-a-header
                 Defaults to ``None``.
-            emails (Optional[List[str]], optional): _description_. Defaults to ``None``.
             icon (Optional[str], optional): The notifications' icon as a URL to a
                 remote file. Defaults to ``None``.
-            base_url (Optional[str], optional): The base URL to use for the API. Can be
-                a coma-separated list of URLs. Defaults to ``None``, i.e.
-                ``https://ntfy.sh`` if ``base_url`` is neither an arg nor in the congig.
             debug (Optional[bool], optional): Whether to print debug information or not.
                 Defaults to ``False``.
 
