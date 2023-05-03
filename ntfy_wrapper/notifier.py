@@ -470,6 +470,7 @@ class Notifier:
 
         assert isinstance(emails, list)
         assert isinstance(topics, list)
+        assert isinstance(base_urls, list)
 
         dispatchs = []
         for base_url in base_urls:
