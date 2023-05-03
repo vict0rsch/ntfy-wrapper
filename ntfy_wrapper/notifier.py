@@ -160,7 +160,14 @@ class Notifier:
                 "📧 Notifier will send emails to: "
                 + ", ".join([code(e) for e in self.conf["emails"]])
             )
-        keys = [k for k in self.conf.keys() if k not in ["topics", "emails"]]
+        if self.conf.get("base_url"):
+            print(
+                "🏡 Notifier will push to base url: "
+                + ", ".join([code(e) for e in self.conf["base_url"]])
+            )
+        keys = [
+            k for k in self.conf.keys() if k not in ["topics", "emails", "base_url"]
+        ]
         if keys:
             ml = max([len(k) for k in keys])
             print(f"🛠  {code('Notifier.notify(..)')} defaults:")
