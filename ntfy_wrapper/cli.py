@@ -121,7 +121,27 @@ def add_email(email: str, conf_path: Optional[str] = None):
         print(f"email {email} already exists.")
         raise typer.Abort()
     write_conf(conf_path, conf)
-    print(f"🎉 Email {code(email)} added to {code(conf_path)}", style="green")
+
+
+@add_app.command("base_url")
+def add_base_url(url: str, conf_path: Optional[str] = None):
+    """
+    Adds an url to the config file to override the default https://ntfy.sh.
+    If --conf-path is not given, the current working directory will be used.
+    """
+    conf_path = get_conf_path(conf_path)
+    if not conf_path.exists():
+        raise typer.Abort(f"Config file not found at {str(conf_path)}")
+    conf = load_conf(conf_path)
+    base_url = conf.get("base_url", [])
+    if url not in base_url:
+        base_url.append(url)
+        conf["base_url"] = base_url
+    else:
+        print(f"base_url {url} already exists.")
+        raise typer.Abort()
+    write_conf(conf_path, conf)
+    print(f"🎉 URL {code(url)} added to {code(conf_path)}", style="green")
 
 
 @add_app.command("default")
@@ -189,6 +209,26 @@ def remove_email(email: str, conf_path: Optional[str] = None):
         print(f"🎉 Email {code(email)} removed from {code(conf_path)}", style="green")
     else:
         print(f"Email {code(email)} does not exist. Ignoring.", style="yellow")
+
+
+@remove_app.command("base_url")
+def remove_base_url(url: str, conf_path: Optional[str] = None):
+    """
+    Removes an url from the config file.
+    If --conf-path is not given, the current working directory will be used.
+    """
+    conf_path = get_conf_path(conf_path)
+    if not conf_path.exists():
+        raise typer.BadParameter(f"Config file not found at {str(conf_path)}")
+    conf = load_conf(conf_path)
+    base_url = conf.get("base_url", "")
+    if url in base_url:
+        base_url = [u.strip() for u in base_url.split(",") if u.strip() != url.strip()]
+        conf["base_url"] = ", ".join(base_url)
+        write_conf(conf_path, conf)
+        print(f"🎉 URL {code(url)} removed from {code(conf_path)}", style="green")
+    else:
+        print(f"URL {code(url)} does not exist. Ignoring.", style="yellow")
 
 
 @remove_app.command("default")
@@ -316,18 +356,19 @@ def describe(conf_path: Optional[str] = None):
         raise typer.BadParameter(f"Config file not found at {str(conf_path)}")
     conf = load_conf(conf_path)
     defaults = code(
-        "\n   • ".join(
+        "\n     • ".join(
             [""]
             + [
                 str(k) + " = " + str(v)
                 for k, v in conf.items()
-                if k not in ["topics", "emails"]
+                if k not in ["topics", "emails", "base_url"]
             ]
         )
     )
     print(f"🎉 Configuration file: {code(conf_path)}", style="green")
     print(f"   Topics: {code(', '.join(conf.get('topics', [])))}", style="green")
     print(f"   Emails: {code(', '.join(conf.get('emails', [])))}", style="green")
+    print(f"   Base URLs: {code(', '.join(conf.get('base_url', [])))}", style="green")
     print(f"   Defaults:{defaults}", style="green")
 
 

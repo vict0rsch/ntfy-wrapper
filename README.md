@@ -5,7 +5,7 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://pypi.org/project/ntfy-wrapper/"><img src="https://img.shields.io/badge/pypi%20package-0.1.6-yellowgreen" alt="PyPI version" height="18"></a>
+    <a href="https://pypi.org/project/ntfy-wrapper/"><img src="https://img.shields.io/badge/pypi%20package-0.1.7-yellowgreen" alt="PyPI version" height="18"></a>
     <a href="https://ntfy-wrapper.readthedocs.io/en/latest/index.html"><img src="https://img.shields.io/badge/docs-read%20the%20docs-blue" alt="PyPI version" height="18"></a>
     <a href="https://github.com/vict0rsch/ntfy-wrapper/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc"><img src="https://img.shields.io/github/issues-raw/vict0rsch/ntfy-wrapper" alt="Open Issues" height="18"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/codestyle-black-red" alt="Black code style" height="18"></a>
@@ -119,7 +119,7 @@ In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscri
 
 `ntfy-wrapper` uses the INI standard along with `configparser` to parse the configuration file. It expects 2 sections:
 
-1. `[notifier_init]` with optional fields `emails = ` and `topics = ` to define systematic targets for the notification instead of putting them in your Python code
+1. `[notifier_init]` with optional fields `emails = `, `topics = ` and `base_url = ` to define systematic targets for the notification instead of putting them in your Python code. `base_url` allows to push to a different `ntfy` server than the default `https://ntfy.sh`.
 2. `[notify_defaults]` with optional fields listed below, which will define default parameters used by `Notifier.notify(...)`. For instance you can set default `title` and `tags` for your code's `.notify(...)` calls and override them at specific locations with keyword arguments `.notify(title="Non-default title")`
    1. The behavior of the `title`, `priority`, `tags`, `click`, `attach`, `actions` and `icon` keys is described in the [`ntfy` docs](https://ntfy.sh/docs/publish/)
 
@@ -128,6 +128,7 @@ In short, `ntfy-wrapper` will *publish* to a *topic* and you'll have to *subscri
 [notifier_init]
 topics = my-secret-topic-1, mysecrettopic2
 emails = you@foo.bar
+base_url = https://custom-ntfy-instance.io
 
 # For Notifier.notify(title=..., priority=..., etc.)
 [notify_defaults]

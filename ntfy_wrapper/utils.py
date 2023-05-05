@@ -46,6 +46,7 @@ Example:
 [notifier_init]
 topics = my-secret-topic-1, mysecrettopic2
 emails = you@foo.bar
+base_url = https://ntfy.your-server.io
 
 # For Notifier.notify(title=..., priority=..., etc.)
 [notify_defaults]
@@ -69,7 +70,7 @@ def get_conf_path(conf_path: Optional[Union[str, Path]] = None) -> Path:
 
     Args:
         conf_path (Optional[Union[str, Path]], optional): Where to look for the config
-            file. Defaults to None.
+            file. Defaults to ``None``.
 
     Returns:
         Path: _description_
@@ -94,7 +95,7 @@ def load_conf(conf_path: Optional[Union[str, Path]] = None) -> dict:
 
     Args:
         conf_path (Optional[Union[str, Path]], optional): Where to load the conf
-        from. Defaults to None.
+        from. Defaults to ``None``.
 
     Returns:
         dict: The configuration as a dictionary.
@@ -112,6 +113,11 @@ def load_conf(conf_path: Optional[Union[str, Path]] = None) -> dict:
             if "emails" in config["notifier_init"]:
                 conf["emails"] = [
                     e.strip() for e in config.get("notifier_init", "emails").split(",")
+                ]
+            if "base_url" in config["notifier_init"]:
+                conf["base_url"] = [
+                    e.strip()
+                    for e in config.get("notifier_init", "base_url").split(",")
                 ]
         if config.has_section("notify_defaults"):
             conf.update(dict(config["notify_defaults"]))
@@ -139,6 +145,7 @@ def write_conf(
     conf = deepcopy(conf)
     topics = conf.pop("topics", None)
     emails = conf.pop("emails", None)
+    base_url = conf.pop("base_url", None)
 
     config = configparser.ConfigParser(allow_no_value=True)
 
@@ -151,6 +158,8 @@ def write_conf(
         config.set("notifier_init", "topics", ",".join(topics))
     if emails:
         config.set("notifier_init", "emails", ",".join(emails))
+    if base_url:
+        config.set("notifier_init", "base_url", ",".join(base_url))
 
     config.add_section("notify_defaults")
     for k, v in conf.items():

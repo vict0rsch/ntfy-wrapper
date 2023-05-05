@@ -15,6 +15,7 @@ from ntfy_wrapper.utils import (
     print,
     KEYS,
 )
+import json
 
 
 class Notifier:
@@ -27,6 +28,7 @@ class Notifier:
         self,
         topics: Optional[Union[str, List[str]]] = None,
         emails: Optional[Union[str, List[str]]] = None,
+        base_url: Optional[Union[str, List[str]]] = None,
         notify_defaults: Optional[Dict] = {},
         conf_path: Optional[Union[str, Path]] = None,
         write: Optional[bool] = True,
@@ -56,28 +58,33 @@ class Notifier:
                 it's probably best you do not track any piece of code containing
                 your topics. That includes the configuration file this class creates
                 automatically (except if ``write`` is False).
-                Defaults to None, meaning a random (uuid) topic will be generated
+                Defaults to ``None``, meaning a random (uuid) topic will be generated
                 for you, and re-used next time, provided you have enabled ``write``.
             emails (Optional[Union[str, List[str]]], optional): String, or list of
                 strings describing the emails to send notifications to by default.
                 Be aware of the rate limits: https://ntfy.sh/docs/publish/#limitations
-                Defaults to None.
+                Defaults to ``None``.
+            base_url (Optional[str], optional): String or list of strings describing
+                the base url to use and send notifications to. It defaults to ``None``,
+                *i.e.* ``https://ntfy.sh`` but you can set it to a self-hosted ``ntfy``
+                instance for example. ``base_url`` can be a list of comma-separated
+                urls, in which case they will all be notified.
             notify_defaults (Optional[Dict], optional): Dict whose keys and values will
                 be default keyword arguments for the ``Notifier.notify()`` method so
                 that you don't have to write the same stuff again and again throughout
-                your code. Defaults to {}.
-            conf_path (Optional[Union[str, Path]], optional): String or pathlib.Path
+                your code. Defaults to ``{}``.
+            conf_path (Optional[Union[str, Path]], optional): String or ``pathlib.Path``
                 pointing to where the Notifier should get or create its INI
-                configuration file. Defaults to None, meaning ``$CWD/.ntfy.conf``.
+                configuration file. Defaults to ``None``, meaning ``$CWD/.ntfy.conf``.
             write (Optional[bool], optional): Whether to write the Notifier's config
                 if a new topic has to be created because none pre-exist.
-                Defaults to True.
+                Defaults to ``True``.
             warnings (Optional[bool], optional): Whether or not to print warnings,
                 in particular the version control warning if ``write`` is True (by
-                default). Defaults to True.
+                default). Defaults to ``True``.
             verbose (Optional[bool], optional): Whether to describe the Notifier after
                 its initialization from your args and the (potentially non-existing)
-                conf. Defaults to True.
+                conf. Defaults to ``True``.
         """
 
         if isinstance(topics, str):
@@ -100,6 +107,8 @@ class Notifier:
             conf["topics"] = topics
         if emails is not None:
             conf["emails"] = emails
+        if base_url is not None:
+            conf["base_url"] = base_url
 
         self.conf = conf
 
@@ -151,7 +160,14 @@ class Notifier:
                 "📧 Notifier will send emails to: "
                 + ", ".join([code(e) for e in self.conf["emails"]])
             )
-        keys = [k for k in self.conf.keys() if k not in ["topics", "emails"]]
+        if self.conf.get("base_url"):
+            print(
+                "🏡 Notifier will push to base url: "
+                + ", ".join([code(e) for e in self.conf["base_url"]])
+            )
+        keys = [
+            k for k in self.conf.keys() if k not in ["topics", "emails", "base_url"]
+        ]
         if keys:
             ml = max([len(k) for k in keys])
             print(f"🛠  {code('Notifier.notify(..)')} defaults:")
@@ -173,7 +189,7 @@ class Notifier:
         Args:
             topics (List[str]): The topics to remove.
             write (Optional[bool], optional): Whether to update the config file or not.
-                Defaults to True.
+                Defaults to ``True``.
         """
         for t in topics:
             if t not in self.conf.get("topics", []):
@@ -196,13 +212,36 @@ class Notifier:
         Args:
             emails (List[str]): The emails to remove.
             write (Optional[bool], optional): Whether to update the config file or not.
-                Defaults to True.
+                Defaults to ``True``.
         """
         for e in emails:
             if e not in self.conf.get("emails", []):
                 self._warn(f"Email {e} is not in the list of emails")
             else:
                 self.conf["emails"].remove(e)
+        if write:
+            self.write_to_conf()
+
+    def remove_base_urls(
+        self,
+        base_urls: List[str],
+        write: Optional[bool] = True,
+    ):
+        """
+        Remove urls from the Notifier's targets.
+        If ``write`` is True, the configuration file is updated.
+        If an url does not exist, it is ignored.
+
+        Args:
+            base_urls (List[str]): The base_urls to remove.
+            write (Optional[bool], optional): Whether to update the config file or not.
+                Defaults to ``True``.
+        """
+        for e in base_urls:
+            if e not in self.conf.get("base_url", []):
+                self._warn(f"URL {e} is not in the list of base_url")
+            else:
+                self.conf["base_url"].remove(e)
         if write:
             self.write_to_conf()
 
@@ -213,7 +252,7 @@ class Notifier:
 
         Args:
             write (Optional[bool], optional): Whether to update the config file or not.
-                Defaults to True.
+                Defaults to ``True``.
         """
         self.conf["topics"] = []
         if write:
@@ -226,9 +265,22 @@ class Notifier:
 
         Args:
             write (Optional[bool], optional): Whether to update the config file or not.
-                Defaults to True.
+                Defaults to ``True``.
         """
         self.conf["emails"] = []
+        if write:
+            self.write_to_conf()
+
+    def remove_all_base_urls(self, write: Optional[bool] = True):
+        """
+        Remove all base urls from the Notifier's targets.
+        If ``write`` is True, the configuration file is updated.
+
+        Args:
+            write (Optional[bool], optional): Whether to update the config file or not.
+                Defaults to ``True``.
+        """
+        self.conf["base_url"] = []
         if write:
             self.write_to_conf()
 
@@ -285,7 +337,8 @@ class Notifier:
         self,
         message: str,
         topics: Optional[Union[str, List[str]]] = None,
-        emails: Optional[List[str]] = None,
+        emails: Optional[Union[str, List[str]]] = None,
+        base_url: Optional[Union[str, List[str]]] = None,
         title: Optional[str] = None,
         priority: Optional[int] = None,
         tags: Optional[Union[str, List[str]]] = None,
@@ -305,6 +358,8 @@ class Notifier:
         The ``defaults`` you may have used in the ``init()`` method are used here.
         You can override them by passing the corresponding arguments.
 
+        In other words: ``arg`` > ``self.conf`` > ``defaults``.
+
         If ``topics`` is None, the topics are taken from the configuration file.
         If ``emails`` is not None, the notification is sent by email to the given
         addresses.
@@ -318,24 +373,31 @@ class Notifier:
         Args:
             message (str): The message to send.
             topics (Optional[Union[str, List[str]]], optional): Target topics to notify.
-                Defaults to None.
+                Defaults to ``None``.
+            emails (Optional[Union[str, List[str]]], optional): Target emails to send
+                notifications to. Defaults to ``None``.
+            base_url (Optional[Union[str, List[str]]], optional): The base URL to use
+                for the API. Can be a coma-separated list of URLs. Defaults to ``None``,
+                i.e. ``https://ntfy.sh`` if ``base_url`` is neither an arg nor in the
+                config.
             title (Optional[str], optional): The notifications' title.
                 Defaults to "From ntfy_wrapper".
             priority (Optional[int], optional): The notifications' priority.
-                Defaults to None.
+                Defaults to ``None``.
             tags (Optional[Union[str, List[str]]], optional): The notifications' tags.
-                Defaults to None.
+                Defaults to ``None``.
             click (Optional[str], optional):  URL to open when a notification is
-                clicked. Defaults to None.
+                clicked. Defaults to ``None``.
             attach (Optional[str], optional): Attachment to send: either a local image
-                file or an URL pointing to one. Defaults to None.
+                file or an URL pointing to one. Defaults to ``None``.
             actions (Optional[Union[str, List[str]]], optional): A string or list of
                 strings describing actions as per:
                 https://ntfy.sh/docs/publish/#using-a-header
-                Defaults to None.
-            emails (Optional[List[str]], optional): _description_. Defaults to None.
+                Defaults to ``None``.
             icon (Optional[str], optional): The notifications' icon as a URL to a
-                remote file. Defaults to None.
+                remote file. Defaults to ``None``.
+            debug (Optional[bool], optional): Whether to print debug information or not.
+                Defaults to ``False``.
 
         Raises:
             ValueError: The user cannot specify both ``attach`` and ``message``
@@ -347,7 +409,7 @@ class Notifier:
         defaults = {
             k.capitalize(): v
             for k, v in self.conf.items()
-            if k not in {"topics", "emails"}
+            if k not in {"topics", "emails", "base_url"}
         }
         headers = {**defaults, "priority": priority}
         headers = {k: v for k, v in headers.items() if v is not None}
@@ -356,6 +418,26 @@ class Notifier:
             raise ValueError("You cannot specify both `attach` and `message`")
 
         use_PUT = False
+
+        if base_url is None:
+            base_url = self.conf.get("base_url", ["https://ntfy.sh"])
+        if isinstance(base_url, str):
+            if "," in base_url:
+                base_urls = [u.strip() for u in base_url.split(",")]
+            else:
+                base_urls = [base_url]
+        if not isinstance(base_urls, list) or not base_urls or not base_urls[0]:
+            self._warn(
+                "\nNo base URL specified in conf or as argument,"
+                + " using https://ntfy.sh\n"
+            )
+            base_urls = ["https://ntfy.sh"]
+
+        for u in base_urls:
+            if not u.startswith("http"):
+                self._warn(f"\nBe careful, base url does not start with `http` : {u}\n")
+
+        base_urls = [u[:-1] if u.endswith("/") else u for u in base_urls]
 
         if title is not None:
             headers["Title"] = title
@@ -395,44 +477,48 @@ class Notifier:
 
         assert isinstance(emails, list)
         assert isinstance(topics, list)
+        assert isinstance(base_urls, list)
 
         dispatchs = []
+        for base_url in base_urls:
+            for dtype, dest in [("topic", t) for t in topics] + [
+                ("email", e) for e in emails
+            ]:
+                h = headers.copy()
 
-        for dtype, dest in [("topic", t) for t in topics] + [
-            ("email", e) for e in emails
-        ]:
-            h = headers.copy()
+                if dtype == "email":
+                    h["Email"] = dest
+                    url = f"{base_url}/alerts"
+                else:
+                    url = f"{base_url}/{dest}"
 
-            if dtype == "email":
-                h["Email"] = dest
-                url = "https://ntfy.sh/alerts"
-            else:
-                url = f"https://ntfy.sh/{dest}"
+                dispatchs.append(dest)
 
-            dispatchs.append(dest)
-
-            if not use_PUT:
-                if debug:
-                    print(f"Sending {message} to {dest}:")
-                    print("    target url: ", url)
-                    print("    message: ", message.encode("utf-8"))
-                    print("    headers: ", h)
-                requests.post(
-                    url,
-                    data=message.encode("utf-8"),
-                    headers=h,
-                )
-            else:
-                h["Filename"] = Path(attach).name
-                requests.put(
-                    url,
-                    data=open(attach, "rb"),
-                    headers=h,
-                )
+                if not use_PUT:
+                    if debug:
+                        print(f"➡️ Sending `{message}` to `{dest}`:")
+                        print("    target url: ", url)
+                        print("    message: ", message.encode("utf-8"))
+                        print(
+                            "    headers: ",
+                            "\n    ".join(json.dumps(h, indent=2).splitlines()),
+                        )
+                    requests.post(
+                        url,
+                        data=message.encode("utf-8"),
+                        headers=h,
+                    )
+                else:
+                    h["Filename"] = Path(attach).name
+                    requests.put(
+                        url,
+                        data=open(attach, "rb"),
+                        headers=h,
+                    )
 
         if debug:
             print(
-                "Debug mode: make sure the above messages,"
+                "\nDebug mode: make sure the above messages,"
                 + " headers and targets are correct."
             )
             print(
