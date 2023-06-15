@@ -165,7 +165,8 @@ def write_conf(
     for k, v in conf.items():
         config.set("notify_defaults", k, v)
 
-    config.write(conf_path.open("w"))
+    with conf_path.open("w", encoding="utf-8") as f:
+        config.write(f)
 
 
 def generate_topic():
